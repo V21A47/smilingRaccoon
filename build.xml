@@ -17,12 +17,7 @@
     </target>
 
 
-    <target name="build.client" description="build the client part of the project">
-        <mkdir dir="client/build"/>
-        <javac destdir="client/build" classpathref="classpath" includeantruntime="false">
-            <src path="client/src"/>
-        </javac>
-    </target>
+
 
     <target name="build.server" description="build the server part of the program">
         <mkdir dir="server/build"/>
@@ -32,7 +27,6 @@
     </target>
 
     <target name="clean.client" description="clean client parh of the project">
-        
         <delete dir="client/build"/>
     </target>
     
@@ -48,6 +42,14 @@
     <target name="clean" description="clean the project" depends="clean.server,clean.client,clean.jars"></target>
     
     <target name="build" description="build the project" depends="build.client,build.server"></target>
+
+    <target name="build.client" description="build the client part of the project">
+        <mkdir dir="client/build"/>
+        <javac destdir="client/build" classpathref="classpath" includeantruntime="false">
+            <src path="client/src"/>
+        </javac>
+    </target>
+    
     
     <target name="stuff.jar.client" description="create a jar file for client part" depends="build.client">
         <manifest file="client/build/MANIFEST.MF">
@@ -60,7 +62,18 @@
             </fileset>
         </jar>
     </target>
+    
+    
+    <target name="run.client" description="run client part" depends="stuff.jar.client">
+        <java jar="client.jar" fork="true"/>
+    </target>
 
+    
+    
+    <target name="run.server" description="run server part" depends="stuff.jar.server">
+        <java jar="server.jar" fork="true"/>
+    </target>
+    
     <target name="stuff.jar.server" description="create a jar file for server part" depends="build.server">
         <manifest file="server/build/MANIFEST.MF">
             <attribute name="Main-Class" value="Server"/>
