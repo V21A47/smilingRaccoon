@@ -1,0 +1,76 @@
+<project name="smilingRaccoon">
+    
+    <path id="classpath">
+        <fileset dir="libs">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+    
+    <target name="make.structure.dirs" description="create project structure catalogs">
+        <mkdir dir="client/src"/>
+        <mkdir dir="server/src"/>
+        <mkdir dir="server/src/AliveObjects"/>
+        <mkdir dir="server/src/Groups"/>
+        <mkdir dir="server/src/Places"/>
+        <mkdir dir="server/src/Interpreter"/>
+        <mkdir dir="libs"/>
+    </target>
+
+
+    <target name="build.client" description="build the client part of the project">
+        <mkdir dir="client/build"/>
+        <javac destdir="client/build" classpathref="classpath" includeantruntime="false">
+            <src path="client/src"/>
+        </javac>
+    </target>
+
+    <target name="build.server" description="build the server part of the program">
+        <mkdir dir="server/build"/>
+        <javac destdir="server/build" classpathref="classpath" includeantruntime="false">
+            <src path="server/src"/>
+        </javac>
+    </target>
+
+    <target name="clean.client" description="clean client parh of the project">
+        
+        <delete dir="client/build"/>
+    </target>
+    
+    <target name="clean.server" description="clean server parh of the project">
+        <delete dir="server/build"/>
+    </target>
+    
+    <target name="clean.jars" description="clean created jars">
+        <delete file="client.jar"/>
+        <delete file="server.jar"/>
+    </target>
+    
+    <target name="clean" description="clean the project" depends="clean.server,clean.client,clean.jars"></target>
+    
+    <target name="build" description="build the project" depends="build.client,build.server"></target>
+    
+    <target name="stuff.jar.client" description="create a jar file for client part" depends="build.client">
+        <manifest file="client/build/MANIFEST.MF">
+            <attribute name="Main-Class" value="Client"/>
+        </manifest>
+        
+        <jar destfile="client.jar" manifest="client/build/MANIFEST.MF">
+            <fileset dir="client/build">
+                <include name="**/*.class"/>
+            </fileset>
+        </jar>
+    </target>
+
+    <target name="stuff.jar.server" description="create a jar file for server part" depends="build.server">
+        <manifest file="server/build/MANIFEST.MF">
+            <attribute name="Main-Class" value="Server"/>
+        </manifest>
+        
+        <jar destfile="server.jar" manifest="server/build/MANIFEST.MF">
+            <fileset dir="server/build">
+                <include name="**/*.class"/>
+            </fileset>
+        </jar>
+    </target>
+    
+</project>
