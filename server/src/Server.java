@@ -1,8 +1,10 @@
-import com.google.gson.Gson;
+import Interpreter.Interpreter;
 
 class Server{
     public static void main(String[] args){
-        Gson gson = new Gson();
-        System.out.println("server part is working");
+        Interpreter i = new Interpreter("testFileName");
+        
+        i.go();
+        
     }
 }

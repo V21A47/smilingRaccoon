@@ -67,6 +67,7 @@ class Parser{
             }
             
             if(command.equals("import")){
+                System.out.println("import statement!");
                 ArrayList<Human> list = CSVManager.readFromFile(operand.trim().substring(1, operand.length()-1));
                 if(list != null){
                     for(Human a: list){
