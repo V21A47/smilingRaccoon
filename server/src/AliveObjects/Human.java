@@ -2,10 +2,11 @@ package AliveObjects;
 
 import Groups.IllegalGroupOperation;
 import Places.Searchable;
+import java.util.Comparator;
 
 public class Human extends AliveObject implements Speakable, Searchable, Comparable {
-    private String birthCertificateNumber = "";
     private HumanType type;
+    private int yearOfBirth;
     public ConditionInCommunity condition;
 
     public static class ConditionInCommunity{
@@ -43,24 +44,30 @@ public class Human extends AliveObject implements Speakable, Searchable, Compara
         }
     }
 
+    public static class HumanComparator implements Comparator<Human>{
+        @Override
+        public int compare(Human a, Human b){
+            return(a.compareTo(b));
+        }
+    }
+    
+    public Human(String name, int age, HumanType type, int x, int y){
+        super(name, age, 80.0D, x, y);
+        this.yearOfBirth = 2018 - age;
+        this.type = type;
+        condition = new ConditionInCommunity(1.0D, StateOfFreedom.FREE, -1);
+    }
+    
     public Human(String name, int age, HumanType type){
         super(name, age, 80.0D);
-
-        for(int i = 0; i < 16; i++){
-            char [] alphabet = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-            birthCertificateNumber = String.format("%s%s", birthCertificateNumber, alphabet[(int)(Math.random() * 16)]);
-        }
-
+        this.yearOfBirth = 2018 - age;
         this.type = type;
         condition = new ConditionInCommunity(1.0D, StateOfFreedom.FREE, -1);
     }
 
     public Human(String name, int age){
         this(name, age, HumanType.NORMAL);
-    }
-
-    public String getBirthCertificateNumber() {
-        return birthCertificateNumber;
+        this.yearOfBirth = 2018 - age;
     }
 
     @Override
@@ -70,15 +77,14 @@ public class Human extends AliveObject implements Speakable, Searchable, Compara
         }
 
         Human human = (Human)(obj);
-        for(int i = 0; i < human.getBirthCertificateNumber().length(); i++){
-            if(birthCertificateNumber.charAt(i) < human.getBirthCertificateNumber().charAt(i)){
-                return -1;
-            } else if(i == human.getBirthCertificateNumber().length() &&
-                    birthCertificateNumber.charAt(i) == human.getBirthCertificateNumber().charAt(i)){
-                return 0;
-            }
+        double result = Math.sqrt((this.getX()*this.getX()) + (this.getY()*this.getY())) -
+                        Math.sqrt((human.getX()*human.getX()) + (human.getY()*human.getY()));
+            
+        if( result < 0 ){
+            return -1;
+        } else if ( result == 0){
+            return 0;
         }
-
         return 1;
     }
 
@@ -89,6 +95,10 @@ public class Human extends AliveObject implements Speakable, Searchable, Compara
         return type;
     }
 
+    public int getYearOfBirth(){
+        return yearOfBirth;
+    }
+        
     public ConditionInCommunity getConditionInCommunity(){return condition;}
 
     public void setState(LawDefender changer, ConditionInCommunity state) {
@@ -99,7 +109,7 @@ public class Human extends AliveObject implements Speakable, Searchable, Compara
     public int hashCode(){
         int hC = this.getName().hashCode();
         hC += this.getAge();
-        hC += this.birthCertificateNumber.hashCode();
+        hC += this.yearOfBirth;
         switch (type){
             case NORMAL: hC += 1000; break;
             case POLICE: hC += 2000; break;
@@ -125,7 +135,8 @@ public class Human extends AliveObject implements Speakable, Searchable, Compara
     public boolean equals(Object object) {
         return object instanceof Human && ((Human) object).isAlive() == this.isAlive() &&
                 ((Human) object).getAge() == this.getAge() && ((Human) object).getName().equals(this.getName()) &&
-                ((Human) object).condition.getState() == condition.getState() && ((Human) object).type == type;
+                ((Human) object).condition.getState() == condition.getState() && ((Human) object).type == type && 
+                ((Human) object).getX() == this.getX() && ((Human) object).getY() == this.getY();
     }
 
     @Override

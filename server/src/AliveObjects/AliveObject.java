@@ -6,6 +6,11 @@ abstract public class AliveObject extends SearchableThing {
     private boolean isAlive = true;
     private int age;
 
+    public AliveObject(String name, int age, double sizeValue, int x, int y){
+        this(name, age, sizeValue);
+        this.move(x, y);
+    }
+    
     public AliveObject(String name, int age, double sizeValue){
         super(sizeValue, name);
         this.age = age;
@@ -23,6 +28,7 @@ abstract public class AliveObject extends SearchableThing {
             this.age=42;
         }
     }
+
 
     public boolean isAlive() {
         return isAlive;

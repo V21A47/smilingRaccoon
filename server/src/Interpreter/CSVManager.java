@@ -14,7 +14,7 @@ public class CSVManager {
             writer.write("");
             writer.close();
         } catch (IOException ex){
-            System.out.println("An error while writing to file " + fileName + " was occurred");
+            System.err.println("An error while writing to file " + fileName + " was occurred");
         }
     }
 
@@ -23,13 +23,16 @@ public class CSVManager {
         try {
             writer = new FileWriter(fileName, true);
         } catch (IOException ex){
-            System.out.println("An error while writing to file " + fileName + " was occurred");
+            System.err.println("An error while writing to file " + fileName + " was occurred");
             return;
         }
 
         StringBuilder text = new StringBuilder();
 
-        text.append(human.getBirthCertificateNumber());
+        text.append(human.getX());
+        text.append(",");
+        
+        text.append(human.getY());
         text.append(",");
 
         text.append(human.getType());
@@ -54,6 +57,9 @@ public class CSVManager {
         text.append(",");
 
         text.append(human.getName());
+        text.append(",");
+        
+        text.append(human.getYearOfBirth());
 
         text.append(System.lineSeparator());
 
@@ -61,17 +67,22 @@ public class CSVManager {
             writer.write(text.toString());
             writer.close();
         } catch (IOException ex){
-            System.out.println("An error while writing to file " + fileName + " was occurred.");
+            System.err.println("An error while writing to file " + fileName + " was occurred.");
         }
     }
 
 
-    public static ArrayList<Human> readFromFile(String fileName) throws FileNotFoundException{
+    public static ArrayList<Human> readFromFile(String fileName){
         InputStreamReader reader;
         Gson gson = new Gson();
 
-        reader = new InputStreamReader(new FileInputStream(fileName));
-
+        try{
+            reader = new InputStreamReader(new FileInputStream(fileName));
+        } catch (FileNotFoundException e){
+            System.err.println("File was not found");
+            return null;
+        }
+        
         int data = 0;
         char symbol;
 
@@ -84,7 +95,7 @@ public class CSVManager {
                 data = reader.read();
                 symbol = (char)data;
             } catch (IOException ex){
-                System.out.println("Error while reading a file");
+                System.err.println("Error while reading a file");
                 return null;
             }
 
@@ -95,35 +106,36 @@ public class CSVManager {
             } else if (symbol == System.lineSeparator().charAt(0)){
                 listOfValues.add(tempString.toString());
                 //
-                if(listOfValues.size() != 9){
-                    System.out.println("Incorrect file data");
+                if(listOfValues.size() != 11){
+                    System.err.println("Incorrect file data");
                     return null;
                 }
                 String jsonText;
-                if(listOfValues.get(1).equals("обычный житель")){
-                    listOfValues.set(1, "NORMAL");
-                } else if (listOfValues.get(1).equals("полицейский")){
-                    listOfValues.set(1, "POLICE");
-                } else if (listOfValues.get(1).equals("бандит")){
-                    listOfValues.set(1, "BANDIT");
+                if(listOfValues.get(2).equals("обычный житель")){
+                    listOfValues.set(2, "NORMAL");
+                } else if (listOfValues.get(2).equals("полицейский")){
+                    listOfValues.set(2, "POLICE");
+                } else if (listOfValues.get(2).equals("бандит")){
+                    listOfValues.set(2, "BANDIT");
                 }
                 try {
                     jsonText = "{" +
-                            "\"birthCertificateNumber\":\"" + listOfValues.get(0) + "\"," +
-                            "\"type\":\"" + listOfValues.get(1) + "\"," +
+                            "\"x\":" + listOfValues.get(0) + "," +
+                            "\"y\":" + listOfValues.get(1) + "," +
+                            "\"type\":\"" + listOfValues.get(2) + "\"," +
                             "\"condition\":{" +
-                            "\"publicAcceptance\":" +  listOfValues.get(2) + "," +
-                            "\"state\":\"" + listOfValues.get(3) + "\"," +
-                            "\"remainingTime\":" + listOfValues.get(4) + "}," +
-                            "\"isAlive\":" + listOfValues.get(5) + "," +
-                            "\"age\":" + listOfValues.get(6) + "," +
-                            "\"sizeValue\":" + listOfValues.get(7) + "," +
-                            "\"name\":\"" + listOfValues.get(8) + "\"" +
+                            "\"publicAcceptance\":" +  listOfValues.get(3) + "," +
+                            "\"state\":\"" + listOfValues.get(4) + "\"," +
+                            "\"remainingTime\":" + listOfValues.get(5) + "}," +
+                            "\"isAlive\":" + listOfValues.get(6) + "," +
+                            "\"age\":" + listOfValues.get(7) + "," +
+                            "\"sizeValue\":" + listOfValues.get(8) + "," +
+                            "\"name\":\"" + listOfValues.get(9) + "\"," +
+                            "\"yearOfBirth\":" + listOfValues.get(10) +
                             "}";
 
-                    //System.out.println(jsonText);
                 }catch (IndexOutOfBoundsException ex) {
-                    System.out.println("Error while parsing json was occurred");
+                    System.err.println("Error while parsing json was occurred");
                     return null;
                 }
 
@@ -137,7 +149,7 @@ public class CSVManager {
         try {
             reader.close();
         } catch (IOException ex){
-            System.out.println("Error while closing file");
+            System.err.println("Error while closing file");
         }
         return listOfHumans;
     }
