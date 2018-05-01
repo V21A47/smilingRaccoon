@@ -4,9 +4,10 @@ import AliveObjects.Human;
 
 class Executor{
     public void execute(String command, Human humanObject){
-        System.out.println("got command:\n"+command+"\n"+humanObject.toString());
-        if(command.equals("add")){
-            CSVManager.writeToFile(humanObject, "testFile");
+        if(humanObject == null){
+            System.out.println("got command:\n\t"+command+"\n\tnull");
+        } else {
+            System.out.println("got command:\n\t"+command+"\n\t"+humanObject.toString());
         }
-    } 
+    }
 }

@@ -27,8 +27,10 @@ class Parser{
     
     /**
     * Parses a string, devides it to command and operand parts. Operand should be conrained in { } brackets.
-    * Then it sends command data to Executor.
-    * @param string the string which consists of command and possible operand
+    * Then it sends command's data to Executor. "Import" command sends by parts of the command and each element
+    * of a file.
+    * 
+    * @param string the string which consists of a command and a possible operand
     */
     public void parse(String string) throws ParseException{
         Executor exec = new Executor();
@@ -75,10 +77,12 @@ class Parser{
                     }
                 }
             } else {
-            Human humanObject = null;
-            humanObject = parseJson(operand);
-            
-            exec.execute(command, humanObject);
+                Human humanObject = null;
+                humanObject = parseJson(operand);
+                
+                if(humanObject != null){
+                    exec.execute(command, humanObject);
+                }
             }
             
         } else if(setOfCOmmandsWithoutOperand.contains(command)){
@@ -88,6 +92,7 @@ class Parser{
     
     /**
     * Jast parses json-string into Human object.
+    * 
     * @param operand a json-string which contains object properties
     * @return a human object
     */
