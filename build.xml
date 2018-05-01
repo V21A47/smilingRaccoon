@@ -5,19 +5,6 @@
             <include name="*.jar"/>
         </fileset>
     </path>
-    
-    <target name="make.structure.dirs" description="create project structure catalogs">
-        <mkdir dir="client/src"/>
-        <mkdir dir="server/src"/>
-        <mkdir dir="server/src/AliveObjects"/>
-        <mkdir dir="server/src/Groups"/>
-        <mkdir dir="server/src/Places"/>
-        <mkdir dir="server/src/Interpreter"/>
-        <mkdir dir="libs"/>
-    </target>
-
-
-
 
     <target name="build.server" description="build the server part of the program">
         <mkdir dir="server/build"/>
@@ -54,6 +41,7 @@
     <target name="stuff.jar.client" description="create a jar file for client part" depends="build.client">
         <manifest file="client/build/MANIFEST.MF">
             <attribute name="Main-Class" value="Client"/>
+            <attribute name="Class-Path" value="libs/gson-2.8.2.jar"/>
         </manifest>
         
         <jar destfile="client.jar" manifest="client/build/MANIFEST.MF">
@@ -77,6 +65,7 @@
     <target name="stuff.jar.server" description="create a jar file for server part" depends="build.server">
         <manifest file="server/build/MANIFEST.MF">
             <attribute name="Main-Class" value="Server"/>
+            <attribute name="Class-Path" value="libs/gson-2.8.2.jar"/>
         </manifest>
         
         <jar destfile="server.jar" manifest="server/build/MANIFEST.MF">

@@ -1,13 +1,15 @@
-import Interpreter.Interpreter;
+import Interpreter.Reader;
+import AliveObjects.Human;
 
 import java.io.IOException;
 
-class Client{
+
+public class Client{
     public static void main(String[] args){
-        Interpreter i = new Interpreter();
+        Reader reader = new Reader();
         
         try{
-            i.go();
+            reader.go();
         } catch (IOException e){
             System.out.println(e.getMessage());
         }
