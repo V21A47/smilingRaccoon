@@ -9,10 +9,13 @@ import java.net.*;
 class Server extends Thread{
     private SocketChannel sc;
     
+    private static String host = "localhost";
+    private static int port = 3128;
+    
     public static void main(String[] args){
         try{
             ServerSocketChannel ssc = ServerSocketChannel.open();
-            ssc.socket().bind(new InetSocketAddress("localhost", 3128));
+            ssc.socket().bind(new InetSocketAddress(host, port));
             
             while(true){
                 new Server(ssc.accept());

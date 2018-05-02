@@ -7,16 +7,22 @@ import java.net.*;
 public class Client{    
     private static int numberOfCalls = 0;
     
+    private static int maxNumberOfCalls = 15;
+    
+    private static String host = "localhost";
+    private static int port = 3128;
+    
+    
     private static Socket getSocket() throws InterruptedException{
         Socket newSocket = null;
         
-        System.err.println("Try to connect: " + numberOfCalls);
-        if(numberOfCalls == 10){
+        //System.err.println("Try to connect: " + numberOfCalls);
+        if(numberOfCalls == maxNumberOfCalls){
             return null;
         }
         
         try{
-            newSocket = new Socket("localhost", 3128);
+            newSocket = new Socket(host, port);
         } catch (SocketException e){
             Thread.sleep(1000);
             numberOfCalls+=1;
@@ -40,7 +46,6 @@ public class Client{
         Reader reader = new Reader();
         
         Socket s = null;
-        
         try{
             s = getSocket();
             if(s == null){
@@ -51,6 +56,8 @@ public class Client{
         }
         
         while(true){
+        
+            // work HERE ->
             try{
                 for(int i = 0; i <10; i+=1){
                     s.getOutputStream().write((args[0] + ": " + i*i).getBytes());
