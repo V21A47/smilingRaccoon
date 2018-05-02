@@ -1,28 +1,80 @@
 import Interpreter.Reader;
-import AliveObjects.Human;
-
-import Interpreter.CSVManager;
-
-import AliveObjects.HumanType;
 import java.io.IOException;
 
-import com.google.gson.Gson;
+import java.io.*;
+import java.net.*;
 
-public class Client{
+public class Client{    
     public static void main(String[] args){
+        boolean isShowed = false;
         Reader reader = new Reader();
-        Gson g = new Gson();
         
-        Human a = new Human("Ivan", 32, HumanType.NORMAL, 100, 20);
-        
-        //CSVManager.writeToFile(a, "file");
-        
-        System.out.println(g.toJson(a));
-        
+        Socket s = null;
         try{
-            reader.go();
+            s = new Socket("localhost", 3128);
+        } catch (UnknownHostException e){
+            System.err.println(e);
+            return;
         } catch (IOException e){
-            System.out.println(e.getMessage());
+            System.out.println(e);
+        }
+        
+        while(true){
+            try{
+                for(int i = 0; i <10; i+=1){
+                    s.getOutputStream().write((args[0] + ": " + i*i).getBytes());
+                    
+                    byte[] buf = new byte[64*1024];
+                    int r = s.getInputStream().read(buf);
+                    if(r > 0){
+                        String text = new String(buf, 0, r);
+                        System.out.println(text);
+                    }
+                    
+                    Thread.sleep(Integer.parseInt(args[1])*1000);
+                }
+                
+                
+                s.close();
+                break;
+        
+            } catch (ConnectException e){
+                if(!isShowed){
+                    System.err.println("Server is not available now");
+                    isShowed = true;
+                }
+            } catch (SocketException e){
+                if(!isShowed){
+                    System.err.println("Server is not available now !!!");
+                    isShowed = true;
+                }
+            } catch (Exception e){
+                System.err.println(e);
+                System.err.println("Something bad was done");
+            }
+            
+            if(isShowed){
+                while(!s.isConnected()){
+                    try{
+                        s = new Socket("localhost", 3128);
+                        
+                    }  catch (UnknownHostException e){
+                        System.err.println(e);
+                        return;
+                    } catch (IOException e){
+                        System.out.println(e);
+                    }
+                    try{
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e){
+                        System.err.println(e);
+                    }
+                }
+                isShowed = false;
+                continue;
+            } else {
+                break;
+            }
         }
     }
 }

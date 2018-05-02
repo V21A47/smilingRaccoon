@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 import java.util.NoSuchElementException;
 
-
 /**
  * Реализует работу с коллекцией.
  *

@@ -75,4 +75,6 @@
         </jar>
     </target>
     
+    <target name="stuff.jars" depends="stuff.jar.server,stuff.jar.client">
+    </target>
 </project>
