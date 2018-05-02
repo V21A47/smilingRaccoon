@@ -10,8 +10,10 @@ import java.util.ArrayList;
 class Parser{
     private HashSet<String> setOfCOmmandsWithoutOperand = new HashSet<>();
     private HashSet<String> setOfCommandsWithOperand = new HashSet<>();
-
+    private Executor exec;
+    
     public Parser(){
+        exec = new Executor();
         setOfCommandsWithOperand.add("remove_greater");
         setOfCOmmandsWithoutOperand.add("save");
         setOfCommandsWithOperand.add("add_if_min");
@@ -33,7 +35,7 @@ class Parser{
     * @param string the string which consists of a command and a possible operand
     */
     public void parse(String string) throws ParseException{
-        Executor exec = new Executor();
+        
         string = string.trim();
         
         if(string.isEmpty()){
