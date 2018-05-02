@@ -5,18 +5,49 @@ import java.io.*;
 import java.net.*;
 
 public class Client{    
+    private static int numberOfCalls = 0;
+    
+    private static Socket getSocket() throws InterruptedException{
+        Socket newSocket = null;
+        
+        System.err.println("Try to connect: " + numberOfCalls);
+        if(numberOfCalls == 10){
+            return null;
+        }
+        
+        try{
+            newSocket = new Socket("localhost", 3128);
+        } catch (SocketException e){
+            Thread.sleep(1000);
+            numberOfCalls+=1;
+            newSocket = getSocket();
+        } catch (UnknownHostException e){
+            Thread.sleep(1000);
+            numberOfCalls+=1;
+            newSocket = getSocket();
+        } catch (IOException e){
+            Thread.sleep(1000);
+            numberOfCalls+=1;
+            newSocket = getSocket();
+        }
+        
+        numberOfCalls = 0;
+        return newSocket;
+    }
+    
     public static void main(String[] args){
         boolean isShowed = false;
         Reader reader = new Reader();
         
         Socket s = null;
+        
         try{
-            s = new Socket("localhost", 3128);
-        } catch (UnknownHostException e){
+            s = getSocket();
+            if(s == null){
+                return;
+            }
+        } catch (InterruptedException e){
             System.err.println(e);
-            return;
-        } catch (IOException e){
-            System.out.println(e);
         }
         
         while(true){
@@ -39,41 +70,29 @@ public class Client{
                 break;
         
             } catch (ConnectException e){
-                if(!isShowed){
-                    System.err.println("Server is not available now");
-                    isShowed = true;
+                System.err.println("Server is not available now");
+                try{
+                    s = getSocket();
+                    if(s == null){
+                        return;
+                    }
+                } catch (InterruptedException ex){
+                    System.err.println(ex);
                 }
+
             } catch (SocketException e){
-                if(!isShowed){
-                    System.err.println("Server is not available now !!!");
-                    isShowed = true;
+                System.err.println("Server is not available now");
+                try{
+                    s = getSocket();
+                    if(s == null){
+                        return;
+                    }
+                } catch (InterruptedException ex){
+                    System.err.println(ex);
                 }
             } catch (Exception e){
                 System.err.println(e);
                 System.err.println("Something bad was done");
-            }
-            
-            if(isShowed){
-                while(!s.isConnected()){
-                    try{
-                        s = new Socket("localhost", 3128);
-                        
-                    }  catch (UnknownHostException e){
-                        System.err.println(e);
-                        return;
-                    } catch (IOException e){
-                        System.out.println(e);
-                    }
-                    try{
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e){
-                        System.err.println(e);
-                    }
-                }
-                isShowed = false;
-                continue;
-            } else {
-                break;
             }
         }
     }
