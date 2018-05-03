@@ -12,7 +12,7 @@ public class Receiver extends Thread{
     private Interpreter interpreter = null;
     
     private String host = "localhost";
-    private int port = 3128;
+    private int port = 8081;
     
     
     public Receiver(Interpreter inter){
@@ -55,11 +55,8 @@ public class Receiver extends Thread{
                 
                 if(bytesRead > 0){
                     String text =  new String(buf.array(), 0, bytesRead);
-
                     buf.clear();
-                    
                     buf.put((interpreter.getCommand(text)).getBytes());
-                    
                     buf.flip();
                     sc.write(buf);
                 }

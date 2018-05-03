@@ -12,11 +12,13 @@ public class Executor{
     private int maxNumberOfCalls = 30;
     
     private String host = "localhost";
-    private int port = 3128;
+    private int port = 8081;
     
     private Socket socket = null;
-    private Jsch jsch = null;
+    private JSch jsch = null;
     private Channel ch = null;
+    private OutputStream os;
+    private InputStream is;
     
     private Socket getSocket() throws InterruptedException{
         Socket newSocket = null;
@@ -46,44 +48,47 @@ public class Executor{
     }
     
     public Executor(){
+    
+        jsch = new JSch();
+        
         try{
-            socket = getSocket();
-            jsch = new JSch();
-            
-            session = jsch.getSession("s242425", "helios.cs.ifmo.ru", 2222);
+            Session session = jsch.getSession("s242425", "helios.cs.ifmo.ru", 2222);
             session.setPassword("vng051");
-            session.setConfig("StrictHostKetChecking", "no");
+            session.setConfig("StrictHostKeyChecking", "no");
             session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
             session.connect();
-            
-            ch = session.getStreamForwader("helios.cs.ifmo.ru", 3128);
+            ch = session.getStreamForwarder("helios.cs.ifmo.ru", port);
             ch.connect();
-            
-            if(socket == null){
-                System.err.println("Server is not available");
-                System.exit(1);
+            try{
+                os = ch.getOutputStream();
+                is = ch.getInputStream();
+            } catch (IOException e){
+                System.err.println(e);
             }
-        } catch (InterruptedException e){
+        } catch (JSchException e){
             System.err.println(e);
         }
+        
     }
 
     public void execute(String command, String operand){
         
         try{
+
+            
             // sends command to the server
             
             if(operand == null){
-                ch.getOutputStream().write(command.getBytes());
+                os.write(command.getBytes());
             } else {
-                ch.getOutputStream().write((command+" "+operand).getBytes());
+                os.write((command+" "+operand).getBytes());
             }
             
             byte[] buf = new byte[64*1024];
             
             int l = 0;
             while(l == 0){
-                l = ch.getInputStream().read(buf);
+                l = is.read(buf);
                 if(l > 0){
                     System.out.println(new String(buf, 0, l));
                 }
@@ -91,27 +96,9 @@ public class Executor{
             
         } catch (ConnectException e){
             System.err.println("Server is not available now");
-            try{
-                socket = getSocket();
-                if(socket == null){
-                    System.err.println("Server is not available");
-                    System.exit(1);
-                }
-            } catch (InterruptedException ex){
-                System.err.println(ex);
-            }
 
         } catch (SocketException e){
             System.err.println("Server is not available now");
-            try{
-                socket = getSocket();
-                if(socket == null){
-                    System.err.println("Server is not available");
-                    System.exit(1);
-                }
-            } catch (InterruptedException ex){
-                System.err.println(ex);
-            }
         } catch (Exception e){
             System.err.println(e);
             System.err.println("Something bad was done");

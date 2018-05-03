@@ -13,7 +13,7 @@ public class Reader{
         Parser parser = new Parser();
         
         int bracketsAmount = 0;
-        
+
             while(shouldWork){
                 System.out.print("> ");
                 int symbolNum = 0;

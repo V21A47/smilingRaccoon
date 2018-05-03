@@ -47,7 +47,8 @@
     <target name="stuff.jar.client" description="create a jar file for client part" depends="build.client">
         <manifest file="client/build/MANIFEST.MF">
             <attribute name="Main-Class" value="Client"/>
-            <attribute name="Class-Path" value="libs/gson-2.8.2.jar"/>
+            <attribute name="Class-Path" value="libs/gson-2.8.2.jar libs/jsch-0.1.54.jar"/>
+
         </manifest>
         
         <jar destfile="client.jar" manifest="client/build/MANIFEST.MF">
