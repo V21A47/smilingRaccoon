@@ -58,10 +58,11 @@ public class Executor{
             session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
             session.connect();
             ch = session.getStreamForwarder("helios.cs.ifmo.ru", port);
-            ch.connect();
+            
             try{
                 os = ch.getOutputStream();
                 is = ch.getInputStream();
+                ch.connect();
             } catch (IOException e){
                 System.err.println(e);
             }
