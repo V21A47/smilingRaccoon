@@ -6,9 +6,15 @@
         </fileset>
     </path>
 
+    <target name="send" depends="stuff.jar.server">
+        <echo message="Using Java version ${ant.java.version}."/>
+        <echo>Java/JVM version: ${ant.java.version}</echo> 
+        <echo>Java/JVM detail version: ${java.version}</echo> 
+    </target>
+    
     <target name="build.server" description="build the server part of the program">
         <mkdir dir="server/build"/>
-        <javac destdir="server/build" classpathref="classpath" includeantruntime="false">
+        <javac includeAntRuntime="no" deprecation="true" target="1.8" source="1.8" destdir="server/build" classpathref="classpath" includeantruntime="true">
             <src path="server/src"/>
         </javac>
     </target>

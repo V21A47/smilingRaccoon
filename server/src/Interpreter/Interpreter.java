@@ -51,31 +51,30 @@ public class Interpreter {
         
         //System.out.println(command + "\n" + operand + "\n" + path + "\n" + human);
         
-        switch (command) {
-            case "remove_lower":
-                return storage.remove_lower(human);
-            case "remove_greater":
-                return storage.remove_greater(human);
-            case "remove":
-                return storage.remove(human);
-            case "add_if_max":
-                return storage.add_if_max(human);
-            case "add_if_min":
-                return storage.add_if_min(human);
-            case "add":
-                return storage.add(human);
-            case "import":
-                return storage.importFromFile(path);
-            case "load":
-                return storage.load();
-            case "info":
-                return storage.info();
-            case "save":
-                return storage.save();
-            case "clear":
-                return storage.clear();
-            default:
-                return "No such command";
+        if (command.equals("remove_lower")){
+            return storage.remove_lower(human);
+        } else if(command.equals("remove_greater")){
+            return storage.remove_greater(human);
+        } else if(command.equals("remove")){
+            return storage.remove(human);
+        } else if(command.equals("add_if_max")){
+            return storage.add_if_max(human);
+        } else if(command.equals("add_if_min")){
+            return storage.add_if_min(human);
+        } else if(command.equals("add")){
+            return storage.add(human);
+        } else if(command.equals("import")){
+            return storage.importFromFile(path);
+        } else if(command.equals("load")){
+            return storage.load();
+        } else if(command.equals("info")){
+            return storage.info();
+        } else if(command.equals("save")){
+            return storage.save();
+        } else if(command.equals("clear")){
+            return storage.clear();
+        } else {
+            return "No such command";
         }
     }
 }
