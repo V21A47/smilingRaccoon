@@ -16,8 +16,7 @@ public class Executor{
     
     private Socket getSocket() throws InterruptedException{
         Socket newSocket = null;
-        
-        //System.err.println("Try to connect: " + numberOfCalls);
+
         if(numberOfCalls == maxNumberOfCalls){
             return null;
         }
@@ -54,23 +53,19 @@ public class Executor{
         }
     }
 
-    public void execute(String command, Human humanObject){
-
-        /*
-        if(humanObject == null){
-            System.out.println("got command:\n\t"+command+"\n\tnull");
-        } else {
-            System.out.println("got command:\n\t"+command+"\n\t"+humanObject.toString());
-        }
-        */
+    public void execute(String command, String operand){
         
         try{
             // sends command to the server
-            socket.getOutputStream().write(command.getBytes());
+            
+            if(operand == null){
+                socket.getOutputStream().write(command.getBytes());
+            } else {
+                socket.getOutputStream().write((command+" "+operand).getBytes());
+            }
             
             byte[] buf = new byte[64*1024];
             
-            // prints the answer
             int l = 0;
             while(l == 0){
                 l = socket.getInputStream().read(buf);
@@ -78,6 +73,19 @@ public class Executor{
                     System.out.println(new String(buf, 0, l));
                 }
             }
+            //oos.flush();
+            
+            //oos.writeObject("a");
+            //ois = new ObjectInputStream(socket.getInputStream());
+            //byte[] buf = new byte[64*1024];
+            
+            // prints the answer
+            //String text = (String)(ois.readObject());
+            //System.out.println(text);
+            
+            /*
+
+            */
             
         } catch (ConnectException e){
             System.err.println("Server is not available now");

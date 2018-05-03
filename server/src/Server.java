@@ -4,7 +4,20 @@ import Interpreter.*;
 
 class Server{
     public static void main(String[] args){
-        Receiver r = new Receiver("newFile");
+    
+        String fileName = System.getenv("ServerFileName");
+        Interpreter inter = new Interpreter(fileName);
+    
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                inter.saveData();
+            }
+        });
+
+        
+        inter.loadData();
+        
+        Receiver r = new Receiver(inter);
         
     }
 }

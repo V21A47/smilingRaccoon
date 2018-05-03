@@ -1,14 +1,18 @@
 package Interpreter;
 
 import AliveObjects.Human;
+import com.google.gson.Gson;
 
 
 public class Interpreter {
     private String fileName;
     private CollectionStorage storage;
-
+    private Gson gson;
+    
     public Interpreter(String fileName){
         this.fileName = fileName;
+        gson = new Gson();
+        
         storage = new CollectionStorage("Main storage", fileName);
     }
 
@@ -23,62 +27,55 @@ public class Interpreter {
         }
     }
 
-    public void getCommand(String command, Object object){
-    
-        Human human = null;
-        String path = null;
-        
-        if(object instanceof Human){
-            human = (Human)(object);
-        } else if (object instanceof String){
-            path = (String)(object);
+    public String getCommand(String text){
+        String command = "",
+               operand = "",
+               path = "";
+               
+        command = text;
+        if(command.indexOf('{')>0){
+            command = text.substring(0, text.indexOf('{')).trim();
+            if(!command.equals("import")){
+                operand = text.substring(text.indexOf('{'), text.length()).trim();
+            } else {
+                path = text.substring(text.indexOf('{')+1, text.length()-1).trim();
+            }            
         }
+        
+        Human human = null;
+        
+        if(!operand.equals("")){
+            System.out.println("trying!");
+            human = gson.fromJson(operand, Human.class);
+        }
+        
+        //System.out.println(command + "\n" + operand + "\n" + path + "\n" + human);
         
         switch (command) {
             case "remove_lower":
-                storage.remove_lower(human);
-                return;
+                return storage.remove_lower(human);
             case "remove_greater":
-                storage.remove_greater(human);
-                return;
+                return storage.remove_greater(human);
             case "remove":
-                storage.remove(human);
-                return;
+                return storage.remove(human);
             case "add_if_max":
-                storage.add_if_max(human);
-                return;
+                return storage.add_if_max(human);
             case "add_if_min":
-                storage.add_if_min(human);
-                return;
+                return storage.add_if_min(human);
             case "add":
-                storage.add(human);
-                return;
+                return storage.add(human);
             case "import":
-                storage.importFromFile(path);
-                return;
-                
-        }
-    }
-    
-    public boolean getCommand(String command){
-        switch(command){
+                return storage.importFromFile(path);
             case "load":
-                storage.load();
-                return true;
+                return storage.load();
             case "info":
-                storage.info();
-                return true;
+                return storage.info();
             case "save":
-                storage.save();
-                return true;
+                return storage.save();
             case "clear":
-                storage.clear();
-                return true;
-            case "exit":
-                storage.save();
-                System.exit(0);
+                return storage.clear();
             default:
-                return false;
+                return "No such command";
         }
     }
 }

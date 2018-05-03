@@ -42,9 +42,11 @@ public class CollectionStorage {
      *
      * @param element объект человека, который нужно поместить в коллекцию
      */
-    public void remove(Human element){
+    public String remove(Human element){
         if(!set.remove(element)){
-            System.err.println(element.getName() + " can't be removed from the collection.");
+            return (element + " can't be removed from the collection.");
+        } else {
+            return (element + " was deleted");
         }
     }
 
@@ -53,10 +55,16 @@ public class CollectionStorage {
      *
      * @param element объект человека, возраст которого используется для проверки при удалении других объектов людей
      */
-    public void remove_greater(Human element){
+    public String remove_greater(Human element){
+        int size = set.size();
         set.removeAll(set.stream()
                         .filter(s -> s.compareTo(element) > 0)
                         .collect(Collectors.toSet()));
+        if(size == set.size()){
+            return ("No elements which are greater than " + element);
+        } else {
+            return ("Elements which are greater than " + element + " were deleted.");
+        }
     }
 
     /**
@@ -64,10 +72,16 @@ public class CollectionStorage {
      *
      * @param element объект человека, сертификат рождения которого используется для проверки при удалении других объектов людей
      */
-    public void remove_lower(Human element){
+    public String remove_lower(Human element){
+        int size = set.size();
         set.removeAll(set.stream()
                         .filter(s -> s.compareTo(element) < 0)
                         .collect(Collectors.toSet()));
+        if(size == set.size()){
+            return ("No elements which are lower than " + element);
+        } else {
+            return ("Elements which are lower than " + element + " were deleted.");
+        }
     }
 
     /**
@@ -76,9 +90,11 @@ public class CollectionStorage {
      *
      * @param element человек, которого нужно поместить в коллекцию
      */
-    public void add(Human element) {
+    public String add(Human element) {
         if (!set.add(element)) {
-            System.err.println(element.getName() + " can't be added to the collection.");
+            return (element + " can't be added to the collection.");
+        } else {
+            return (element + " was added to the collection.");
         }
     }
 
@@ -86,7 +102,9 @@ public class CollectionStorage {
      * 
      * @param element человек, которого нужно поместить в коллекцию
      */
-    public void add_if_max(Human element) {
+    public String add_if_max(Human element) {
+        int size = set.size();
+        
         try{
             if(element.compareTo(set.stream().max(Human::compareTo).get()) > 0){
                 set.add(element);
@@ -94,19 +112,33 @@ public class CollectionStorage {
         } catch (NoSuchElementException e){
             set.add(element);
         }
+        
+        if(size == set.size()){
+            return (element + " can't be added to the collection.");
+        } else {
+            return (element + " was added to the collection.");
+        }
     }
 
     /**
      * 
      * @param element человек, которого нужно поместить в коллекцию
      */
-    public void add_if_min(Human element){
+    public String add_if_min(Human element){
+        int size = set.size();
+        
         try{
             if(element.compareTo(set.stream().min(Human::compareTo).get()) < 0){
                 set.add(element);
             }
         } catch (NoSuchElementException e){
             set.add(element);
+        }
+        
+        if(size == set.size()){
+            return (element + " can't be added to the collection.");
+        } else {
+            return (element + " was added to the collection.");
         }
     }
 
@@ -117,59 +149,78 @@ public class CollectionStorage {
      *
      * @param fileName имя файла, в котором должны находиться объекты (fileName.csv, например).
      */
-    public void importFromFile(String fileName){
+    public String importFromFile(String fileName){
         ArrayList<Human> humans = CSVManager.readFromFile(fileName);
         
+        int size = set.size();
+        
         if(humans == null){
-            System.err.println("No data was loaded from the file");
+            return ("No data was loaded from the file.");
         } else {
             set.addAll(humans);
+            if(size == set.size()){
+                return("No data was loaded from the file.");
+            }else{
+                return ("Some objects were loaded from a file " + fileName);
+            }
         }
     }
 
     /**
      * Команда info выводит информацию о текущем состоянии коллекции.
      */
-    public void info(){
-        System.out.printf("The size is %d.%n" , set.size());
+    public String info(){
+        StringBuilder s = new StringBuilder();
+        
+        s.append(("The size is " + set.size()) + "\n");
         List<Human> list = set.stream()
                                     .collect(Collectors.toList());
         
         if(list.size() > 0) {
-            System.out.println("Contains:");
-            System.out.println("+---------------+-----+------+------------------+-----+-----+");
-            System.out.println("|     name      | age | size |       type       |  x  |  y  |"); 
-            System.out.println("+---------------+-----+------+------------------+-----+-----+");
+            s.append("Contains:" + "\n");
+            //s.append("+---------------+-----+------+------------------+-----+-----+");
+            //s.append("|     name      | age | size |       type       |  x  |  y  |"); 
+            //s.append("+---------------+-----+------+------------------+-----+-----+");
             
             for (Human h : list) {
-                System.out.printf("|%-15s|%-5d|%-6.1f|%-18s|%-5d|%-5d|\n",
-                        h.getName(), h.getAge(), h.getSizeValue(), h.getType(), h.getX(), h.getY());
-                System.out.println("+---------------+-----+------+------------------+-----+-----+");
+                //System.out.printf("|%-15s|%-5d|%-6.1f|%-18s|%-5d|%-5d|\n",
+                s.append(h.getName() +" "+ h.getAge() +" "+ h.getSizeValue() +" "+ h.getType() +" "+ h.getX() +" "+ h.getY() + "\n");
+                //s.append("+---------------+-----+------+------------------+-----+-----+");
             }
         }
+        
+        return(s.toString());
     }
 
     /**
      * Команда save сохраняет содержимое коллекции в файл.
      *
      */
-    public void save(){
+    public String save(){
         CSVManager.clearFile(fileName);
         set.stream().forEach( (p) -> CSVManager.writeToFile(p, fileName));
+        
+        return("The collection was saved to the file " + fileName);
     }
 
     /**
      * Команда clear удаляет все элементы коллекции.
      */
-    public void clear(){
+    public String clear(){
         set.clear();
+        return("All elements were deleted from the collection");
     }
 
     /**
      * Команда load очищает коллекцию и записывает в нее объекты, описанные  в файле.
      */
-    public void load() {
+    public String load() {
         set.clear();
         importFromFile(fileName);
+        if(set.size() > 0){
+            return ("Some objects were loaded from a file " + fileName);
+        } else {
+            return ("No objects were loaded from a file " + fileName);
+        }
     }
 }

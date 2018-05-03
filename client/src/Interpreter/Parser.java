@@ -71,19 +71,14 @@ class Parser{
             }
             
             if(command.equals("import")){
-                System.out.println("import statement!");
-                ArrayList<Human> list = CSVManager.readFromFile(operand.trim().substring(1, operand.length()-1));
-                if(list != null){
-                    for(Human a: list){
-                        exec.execute(command, a);
-                    }
-                }
+                exec.execute(command, operand);
             } else {
                 Human humanObject = null;
                 humanObject = parseJson(operand);
                 
                 if(humanObject != null){
-                    exec.execute(command, humanObject);
+                                        // was humanObject
+                    exec.execute(command, operand);
                 }
             }
             
