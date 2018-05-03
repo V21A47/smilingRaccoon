@@ -178,14 +178,8 @@ public class CollectionStorage {
         
         if(list.size() > 0) {
             s.append("Contains:" + "\n");
-            //s.append("+---------------+-----+------+------------------+-----+-----+");
-            //s.append("|     name      | age | size |       type       |  x  |  y  |"); 
-            //s.append("+---------------+-----+------+------------------+-----+-----+");
-            
             for (Human h : list) {
-                //System.out.printf("|%-15s|%-5d|%-6.1f|%-18s|%-5d|%-5d|\n",
                 s.append(h.getName() +" "+ h.getAge() +" "+ h.getSizeValue() +" "+ h.getType() +" "+ h.getX() +" "+ h.getY() + "\n");
-                //s.append("+---------------+-----+------+------------------+-----+-----+");
             }
         }
         
@@ -217,10 +211,40 @@ public class CollectionStorage {
     public String load() {
         set.clear();
         importFromFile(fileName);
+        
         if(set.size() > 0){
             return ("Some objects were loaded from a file " + fileName);
         } else {
             return ("No objects were loaded from a file " + fileName);
         }
+    }
+    
+    public String story(){
+        StringBuilder s = new StringBuilder();
+        
+        Human policeman = new Human("Pavel", 32, HumanType.POLICE, 0, 0);
+        Human robber = new Human("Vasya", 20, HumanType.BANDIT, 10, 10);
+        
+        set.add(policeman);
+        set.add(robber);
+        
+        s.append("Two persons do activity in this story:\n" + info());
+        
+        s.append("Robber is running away");
+        
+        //s.remove(robber);
+        robber.move(20, 20);
+        s.append(info());
+        s.append("And faster");
+        robber.move(100,100);
+        s.append(info());
+        s.append("But the policeman is faster");
+        policeman.move(100,100);
+        s.append(info());
+        s.append("Game over");
+        set.remove(robber);
+        s.append(info());
+        
+        return(s.toString());
     }
 }

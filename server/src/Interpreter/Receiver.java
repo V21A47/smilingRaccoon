@@ -55,58 +55,13 @@ public class Receiver extends Thread{
                 
                 if(bytesRead > 0){
                     String text =  new String(buf.array(), 0, bytesRead);
-                    
-                    
-                    
+
                     buf.clear();
                     
                     buf.put((interpreter.getCommand(text)).getBytes());
                     
                     buf.flip();
                     sc.write(buf);
-                    
-                    //System.out.println("-> " + text);
-                    
-                    
-                    //bais = new ByteArrayInputStream(buf.array());
-                    //ObjectInputStream ois = new ObjectInputStream(bais);
-                    
-                    
-                    
-                    //System.out.println((String)(ois.readObject()));
-                    
-                    /*
-                    byte[] shortBuffer = new byte[bytesRead];
-                    
-                    for(int i = 0; i < bytesRead; i++){
-                        shortBuffer[i] = buf.array()[i];
-                    }
-                    
-                    
-                    bais = new ByteArrayInputStream(shortBuffer);
-                    System.out.println("read");
-                    
-                    ObjectInputStream ois = new ObjectInputStream(bais);
-                    System.out.println("read");
-                    System.out.println(buf.array());
-                    
-                    
-                    Object text = ois.readObject();
-                    System.out.println("read");
-                    String message = (String)(text);
-                    
-                    
-                    System.out.println("--> " + text);
-                    */
-                    /*
-
-                    // send
-                    //buf.clear();
-                    //buf.put("hello".getBytes());
-                    //buf.flip();
-                    //sc.write(buf);
-                    //
-                    */
                 }
                 Thread.sleep(100);
             }

@@ -73,6 +73,8 @@ public class Interpreter {
             return storage.save();
         } else if(command.equals("clear")){
             return storage.clear();
+        } else if(command.equals("story")){
+            return storage.story();
         } else {
             return "No such command";
         }

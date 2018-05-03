@@ -25,6 +25,7 @@ class Parser{
         setOfCommandsWithOperand.add("add");
         setOfCommandsWithOperand.add("add_if_max");
         setOfCommandsWithOperand.add("remove_lower");
+        setOfCOmmandsWithoutOperand.add("story");
     }
     
     /**
