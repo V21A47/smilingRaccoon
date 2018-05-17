@@ -7,7 +7,7 @@ import java.io.*;
 import java.util.ArrayList;
 
 public class CSVManager {
-    public static void clearFile(String fileName){
+    public synchronized static void clearFile(String fileName){
         FileWriter writer;
         try {
             writer = new FileWriter(fileName);
@@ -18,7 +18,7 @@ public class CSVManager {
         }
     }
 
-    public static void writeToFile(Human human, String fileName){
+    public synchronized static void writeToFile(Human human, String fileName){
         FileWriter writer;
         try {
             writer = new FileWriter(fileName, true);
@@ -31,7 +31,7 @@ public class CSVManager {
 
         text.append(human.getX());
         text.append(",");
-        
+
         text.append(human.getY());
         text.append(",");
 
@@ -58,7 +58,7 @@ public class CSVManager {
 
         text.append(human.getName());
         text.append(",");
-        
+
         text.append(human.getYearOfBirth());
 
         text.append(System.lineSeparator());
@@ -72,7 +72,7 @@ public class CSVManager {
     }
 
 
-    public static ArrayList<Human> readFromFile(String fileName){
+    public synchronized static ArrayList<Human> readFromFile(String fileName){
         InputStreamReader reader;
         Gson gson = new Gson();
 
@@ -82,7 +82,7 @@ public class CSVManager {
             System.err.println("File was not found");
             return null;
         }
-        
+
         int data = 0;
         char symbol;
 

@@ -49,9 +49,9 @@ public class CollectionStorage {
             return (element + " was deleted");
         }
     }
-  
+
     /**
-     * 
+     *
      *
      * @param element объект человека, возраст которого используется для проверки при удалении других объектов людей
      */
@@ -99,12 +99,12 @@ public class CollectionStorage {
     }
 
     /**
-     * 
+     *
      * @param element человек, которого нужно поместить в коллекцию
      */
     public String add_if_max(Human element) {
         int size = set.size();
-        
+
         try{
             if(element.compareTo(set.stream().max(Human::compareTo).get()) > 0){
                 set.add(element);
@@ -112,7 +112,7 @@ public class CollectionStorage {
         } catch (NoSuchElementException e){
             set.add(element);
         }
-        
+
         if(size == set.size()){
             return (element + " can't be added to the collection.");
         } else {
@@ -121,12 +121,12 @@ public class CollectionStorage {
     }
 
     /**
-     * 
+     *
      * @param element человек, которого нужно поместить в коллекцию
      */
     public String add_if_min(Human element){
         int size = set.size();
-        
+
         try{
             if(element.compareTo(set.stream().min(Human::compareTo).get()) < 0){
                 set.add(element);
@@ -134,14 +134,13 @@ public class CollectionStorage {
         } catch (NoSuchElementException e){
             set.add(element);
         }
-        
+
         if(size == set.size()){
             return (element + " can't be added to the collection.");
         } else {
             return (element + " was added to the collection.");
         }
     }
-
 
     /**
      * Команда import импортирует все объекты из файла в коллекцию. При попытке передать уже имеющиеся в коллекции
@@ -151,9 +150,9 @@ public class CollectionStorage {
      */
     public String importFromFile(String fileName){
         ArrayList<Human> humans = CSVManager.readFromFile(fileName);
-        
+
         int size = set.size();
-        
+
         if(humans == null){
             return ("No data was loaded from the file.");
         } else {
@@ -171,24 +170,24 @@ public class CollectionStorage {
      */
     public String info(){
         StringBuilder s = new StringBuilder();
-        
+
         s.append(("The size is " + set.size()) + "\n");
         List<Human> list = set.stream()
                                     .collect(Collectors.toList());
-        
+
         if(list.size() > 0) {
             s.append("Contains:" + "\n");
             //s.append("+---------------+-----+------+------------------+-----+-----+");
-            //s.append("|     name      | age | size |       type       |  x  |  y  |"); 
+            //s.append("|     name      | age | size |       type       |  x  |  y  |");
             //s.append("+---------------+-----+------+------------------+-----+-----+");
-            
+
             for (Human h : list) {
                 //System.out.printf("|%-15s|%-5d|%-6.1f|%-18s|%-5d|%-5d|\n",
                 s.append(h.getName() +" "+ h.getAge() +" "+ h.getSizeValue() +" "+ h.getType() +" "+ h.getX() +" "+ h.getY() + "\n");
                 //s.append("+---------------+-----+------+------------------+-----+-----+");
             }
         }
-        
+
         return(s.toString());
     }
 
@@ -199,7 +198,7 @@ public class CollectionStorage {
     public String save(){
         CSVManager.clearFile(fileName);
         set.stream().forEach( (p) -> CSVManager.writeToFile(p, fileName));
-        
+
         return("The collection was saved to the file " + fileName);
     }
 

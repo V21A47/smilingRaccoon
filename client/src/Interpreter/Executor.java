@@ -4,43 +4,35 @@ import AliveObjects.Human;
 import java.io.*;
 import java.net.*;
 
+
 public class Executor{
 
     private int numberOfCalls = 0;
     private int maxNumberOfCalls = 30;
-    
+
     private String host = "localhost";
     private int port = 3128;
-    
-    private Socket socket = null;
-    
-    private Socket getSocket() throws InterruptedException{
-        Socket newSocket = null;
 
+    private Socket socket = null;
+
+    private Socket getSocket() throws InterruptedException{
         if(numberOfCalls == maxNumberOfCalls){
             return null;
         }
-        
+
+        Socket newSocket = null;
         try{
             newSocket = new Socket(host, port);
-        } catch (SocketException e){
-            Thread.sleep(1000);
-            numberOfCalls+=1;
-            newSocket = getSocket();
-        } catch (UnknownHostException e){
-            Thread.sleep(1000);
-            numberOfCalls+=1;
-            newSocket = getSocket();
         } catch (IOException e){
-            Thread.sleep(1000);
+            Thread.sleep(500);
             numberOfCalls+=1;
             newSocket = getSocket();
         }
-        
+
         numberOfCalls = 0;
         return newSocket;
     }
-    
+
     public Executor(){
         try{
             socket = getSocket();
@@ -54,52 +46,42 @@ public class Executor{
     }
 
     public void execute(String command, String operand){
-        
         try{
-            // sends command to the server
-            
+            // Send
+            String message = "";
+
             if(operand == null){
-                socket.getOutputStream().write(command.getBytes());
+                message = command;
             } else {
-                socket.getOutputStream().write((command+" "+operand).getBytes());
-            }
-            
-            byte[] buf = new byte[64*1024];
-            
-            int l = 0;
-            while(l == 0){
-                l = socket.getInputStream().read(buf);
-                if(l > 0){
-                    System.out.println(new String(buf, 0, l));
-                }
-            }
-            //oos.flush();
-            
-            //oos.writeObject("a");
-            //ois = new ObjectInputStream(socket.getInputStream());
-            //byte[] buf = new byte[64*1024];
-            
-            // prints the answer
-            //String text = (String)(ois.readObject());
-            //System.out.println(text);
-            
-            /*
-
-            */
-            
-        } catch (ConnectException e){
-            System.err.println("Server is not available now");
-            try{
-                socket = getSocket();
-                if(socket == null){
-                    System.err.println("Server is not available");
-                    System.exit(1);
-                }
-            } catch (InterruptedException ex){
-                System.err.println(ex);
+                message = new String(command + " " + operand);
             }
 
-        } catch (SocketException e){
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(bos);
+
+            oos.writeObject(message);
+            oos.flush();
+
+            byte [] serializedObject = bos.toByteArray();
+            String amount = String.valueOf(serializedObject.length);
+
+            socket.getOutputStream().write(serializedObject);
+
+
+            Thread.sleep(25);
+
+
+            // Receive
+            serializedObject = new byte[1024];
+            socket.getInputStream().read(serializedObject);
+            ByteArrayInputStream bis = new ByteArrayInputStream(serializedObject);
+            ObjectInputStream ois = new ObjectInputStream(bis);
+            Object obj = ois.readObject();
+            String str = (String)obj;
+            System.out.println(str);
+
+
+        } catch (ConnectException|StreamCorruptedException e){
             System.err.println("Server is not available now");
             try{
                 socket = getSocket();
@@ -112,8 +94,7 @@ public class Executor{
             }
         } catch (Exception e){
             System.err.println(e);
-            System.err.println("Something bad was done");
         }
-        
+
     }
 }
