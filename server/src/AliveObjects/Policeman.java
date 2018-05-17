@@ -8,11 +8,7 @@ public class Policeman extends Human implements LawDefender {
     }
 
     public boolean getGrounds(AliveObject object){
-        if(groundsForActivity.getImportance() >= 0.3D && groundsForActivity.getObject().equals(object)){
-            return true;
-        } else {
-            return false;
-        }
+        return true;
     }
 
     public void arrest(Human human){

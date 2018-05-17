@@ -2,6 +2,7 @@ package Interpreter;
 
 import AliveObjects.Human;
 import AliveObjects.HumanType;
+import AliveObjects.Policeman;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,9 +50,9 @@ public class CollectionStorage {
             return (element + " was deleted");
         }
     }
-  
+
     /**
-     * 
+     *
      *
      * @param element объект человека, возраст которого используется для проверки при удалении других объектов людей
      */
@@ -99,12 +100,12 @@ public class CollectionStorage {
     }
 
     /**
-     * 
+     *
      * @param element человек, которого нужно поместить в коллекцию
      */
     public String add_if_max(Human element) {
         int size = set.size();
-        
+
         try{
             if(element.compareTo(set.stream().max(Human::compareTo).get()) > 0){
                 set.add(element);
@@ -112,7 +113,7 @@ public class CollectionStorage {
         } catch (NoSuchElementException e){
             set.add(element);
         }
-        
+
         if(size == set.size()){
             return (element + " can't be added to the collection.");
         } else {
@@ -121,12 +122,12 @@ public class CollectionStorage {
     }
 
     /**
-     * 
+     *
      * @param element человек, которого нужно поместить в коллекцию
      */
     public String add_if_min(Human element){
         int size = set.size();
-        
+
         try{
             if(element.compareTo(set.stream().min(Human::compareTo).get()) < 0){
                 set.add(element);
@@ -134,14 +135,13 @@ public class CollectionStorage {
         } catch (NoSuchElementException e){
             set.add(element);
         }
-        
+
         if(size == set.size()){
             return (element + " can't be added to the collection.");
         } else {
             return (element + " was added to the collection.");
         }
     }
-
 
     /**
      * Команда import импортирует все объекты из файла в коллекцию. При попытке передать уже имеющиеся в коллекции
@@ -151,9 +151,9 @@ public class CollectionStorage {
      */
     public String importFromFile(String fileName){
         ArrayList<Human> humans = CSVManager.readFromFile(fileName);
-        
+
         int size = set.size();
-        
+
         if(humans == null){
             return ("No data was loaded from the file.");
         } else {
@@ -171,18 +171,24 @@ public class CollectionStorage {
      */
     public String info(){
         StringBuilder s = new StringBuilder();
-        
+
         s.append(("The size is " + set.size()) + "\n");
         List<Human> list = set.stream()
                                     .collect(Collectors.toList());
-        
+
         if(list.size() > 0) {
-            s.append("Contains:" + "\n");
+            s.append("Contains: \n");
+            s.append("  name     age     size       type       x       y \n");
+
             for (Human h : list) {
-                s.append(h.getName() +" "+ h.getAge() +" "+ h.getSizeValue() +" "+ h.getType() +" "+ h.getX() +" "+ h.getY() + "\n");
+                String t = h.getType().toString();
+                if(t.length() < 10){
+                    t = new String(t + "    ");
+                }
+                s.append(h.getName() +"\t"+ h.getAge() +"\t"+ h.getSizeValue() +"\t"+ t +"   "+ h.getX() +"\t"+ h.getY() + "\n");
             }
         }
-        
+
         return(s.toString());
     }
 
@@ -193,7 +199,7 @@ public class CollectionStorage {
     public String save(){
         CSVManager.clearFile(fileName);
         set.stream().forEach( (p) -> CSVManager.writeToFile(p, fileName));
-        
+
         return("The collection was saved to the file " + fileName);
     }
 
@@ -211,40 +217,52 @@ public class CollectionStorage {
     public String load() {
         set.clear();
         importFromFile(fileName);
-        
+
         if(set.size() > 0){
             return ("Some objects were loaded from a file " + fileName);
         } else {
             return ("No objects were loaded from a file " + fileName);
         }
     }
-    
     public String story(){
+        set.clear();
         StringBuilder s = new StringBuilder();
-        
-        Human policeman = new Human("Pavel", 32, HumanType.POLICE, 0, 0);
-        Human robber = new Human("Vasya", 20, HumanType.BANDIT, 10, 10);
-        
+        s.append("Начинается история!\n");
+        s.append("Сначала был полицейский Пшигль...\n");
+        Policeman policeman = new Policeman("Pshigl");
+
         set.add(policeman);
-        set.add(robber);
-        
-        s.append("Two persons do activity in this story:\n" + info());
-        
-        s.append("Robber is running away");
-        
-        //s.remove(robber);
-        robber.move(20, 20);
         s.append(info());
-        s.append("And faster");
-        robber.move(100,100);
+        s.append("Потом стали бандиты...\n");
+        Human bandit1 = new Human("Vasya", 21, HumanType.BANDIT);
+        Human bandit2 = new Human("Tolan", 19, HumanType.BANDIT);
+        bandit1.move(15, 15);
+        bandit2.move(15, 16);
+
+        set.add(bandit1);
+        set.add(bandit2);
+
         s.append(info());
-        s.append("But the policeman is faster");
-        policeman.move(100,100);
+
+        s.append(policeman + " ведет поиски каких-то бандитов, которые уезжали на автомобиле.\n");
+
+        policeman.move(20, 20);
+        bandit1.move(25, 25);
+        bandit2.move(26, 25);
+
         s.append(info());
-        s.append("Game over");
-        set.remove(robber);
+
+        policeman.move(-19, -19);
+        bandit1.move(-22, -22);
+        bandit2.move(-21, -22);
+
+        s.append("И ловит их наконец!\n");
+
+        policeman.arrest(bandit1);
+        policeman.arrest(bandit2);
+
         s.append(info());
-        
-        return(s.toString());
+
+        return s.toString();
     }
 }
