@@ -8,11 +8,11 @@ public class Interpreter {
     private String fileName;
     private CollectionStorage storage;
     private Gson gson;
-    
+
     public Interpreter(String fileName){
         this.fileName = fileName;
         gson = new Gson();
-        
+
         storage = new CollectionStorage("Main storage", fileName);
     }
 
@@ -31,7 +31,7 @@ public class Interpreter {
         String command = "",
                operand = "",
                path = "";
-               
+
         command = text;
         if(command.indexOf('{')>0){
             command = text.substring(0, text.indexOf('{')).trim();
@@ -39,18 +39,18 @@ public class Interpreter {
                 operand = text.substring(text.indexOf('{'), text.length()).trim();
             } else {
                 path = text.substring(text.indexOf('{')+1, text.length()-1).trim();
-            }            
+            }
         }
-        
+
         Human human = null;
-        
+
         if(!operand.equals("")){
             System.out.println("trying!");
             human = gson.fromJson(operand, Human.class);
         }
-        
+
         //System.out.println(command + "\n" + operand + "\n" + path + "\n" + human);
-        
+
         if (command.equals("remove_lower")){
             return storage.remove_lower(human);
         } else if(command.equals("remove_greater")){
@@ -73,6 +73,8 @@ public class Interpreter {
             return storage.save();
         } else if(command.equals("clear")){
             return storage.clear();
+        } else if(command.equals("story")){
+            return storage.story();
         } else {
             return "No such command";
         }

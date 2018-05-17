@@ -2,6 +2,7 @@ package Interpreter;
 
 import AliveObjects.Human;
 import AliveObjects.HumanType;
+import AliveObjects.Policeman;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -176,15 +177,15 @@ public class CollectionStorage {
                                     .collect(Collectors.toList());
 
         if(list.size() > 0) {
-            s.append("Contains:" + "\n");
-            //s.append("+---------------+-----+------+------------------+-----+-----+");
-            //s.append("|     name      | age | size |       type       |  x  |  y  |");
-            //s.append("+---------------+-----+------+------------------+-----+-----+");
+            s.append("Contains: \n");
+            s.append("  name     age     size       type       x       y \n");
 
             for (Human h : list) {
-                //System.out.printf("|%-15s|%-5d|%-6.1f|%-18s|%-5d|%-5d|\n",
-                s.append(h.getName() +" "+ h.getAge() +" "+ h.getSizeValue() +" "+ h.getType() +" "+ h.getX() +" "+ h.getY() + "\n");
-                //s.append("+---------------+-----+------+------------------+-----+-----+");
+                String t = h.getType().toString();
+                if(t.length() < 10){
+                    t = new String(t + "    ");
+                }
+                s.append(h.getName() +"\t"+ h.getAge() +"\t"+ h.getSizeValue() +"\t"+ t +"   "+ h.getX() +"\t"+ h.getY() + "\n");
             }
         }
 
@@ -221,5 +222,47 @@ public class CollectionStorage {
         } else {
             return ("No objects were loaded from a file " + fileName);
         }
+    }
+
+    public String story(){
+        set.clear();
+        StringBuilder s = new StringBuilder();
+        s.append("Начинается история!\n");
+        s.append("Сначала был полицейский Пшигль...\n");
+        Policeman policeman = new Policeman("Pshigl");
+
+        set.add(policeman);
+        s.append(info());
+        s.append("Потом стали бандиты...\n");
+        Human bandit1 = new Human("Vasya", 21, HumanType.BANDIT);
+        Human bandit2 = new Human("Tolan", 19, HumanType.BANDIT);
+        bandit1.move(15, 15);
+        bandit2.move(15, 16);
+
+        set.add(bandit1);
+        set.add(bandit2);
+
+        s.append(info());
+
+        s.append(policeman + " ведет поиски каких-то бандитов, которые уезжали на автомобиле.\n");
+
+        policeman.move(20, 20);
+        bandit1.move(25, 25);
+        bandit2.move(26, 25);
+
+        s.append(info());
+
+        policeman.move(-19, -19);
+        bandit1.move(-22, -22);
+        bandit2.move(-21, -22);
+
+        s.append("И ловит их наконец!\n");
+
+        policeman.arrest(bandit1);
+        policeman.arrest(bandit2);
+
+        s.append(info());
+
+        return s.toString();
     }
 }
