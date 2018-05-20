@@ -9,6 +9,10 @@ public class Human extends AliveObject implements Speakable, Searchable, Compara
     public ConditionInCommunity condition;
     private String gender;
 
+    public String getGender(){
+        return gender;
+    }
+
     public static class ConditionInCommunity{
         private StateOfFreedom state;
         private int remainingTime;

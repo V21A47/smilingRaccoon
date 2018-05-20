@@ -30,6 +30,14 @@ public class ServerWindow extends JFrame{
 
     private HashMap<DefaultMutableTreeNode, Human> mapOfNodes;
 
+    protected Interpreter getInterpreter(){
+        return interpreter;
+    }
+
+    protected Sheduler getSheduler(){
+        return sheduler;
+    }
+
     public ServerWindow(Sheduler sheduler, Interpreter interpreter, String userName){
         super("ServerWindow: " + userName + "  :  " + interpreter.getFileName());
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -132,6 +140,9 @@ public class ServerWindow extends JFrame{
 
         {// Events
             buttonRemove.addActionListener(new ButtonRemoveEventListener());
+            buttonAdd.addActionListener(new ButtonAddEventListener());
+            buttonEdit.addActionListener(new ButtonEditActionListener());
+
             menuItemSave.addActionListener(new MenuItemSaveEventListener());
             menuItemLoad.addActionListener(new MenuItemLoadEventListener());
             menuItemImport.addActionListener(new MenuItemImportEventListener());
@@ -142,11 +153,13 @@ public class ServerWindow extends JFrame{
         this.setBounds(100, 100, 1200, 900);
     }
 
+
     private DefaultMutableTreeNode getNodeOfObject(Object obj){
         Human human = (Human)obj;
-        return new DefaultMutableTreeNode( human.getType() + "  " + human.getName() +
-                                            human.getYearOfBirth() + "  " + human.getX() +
-                                            "   " + human.getY());
+        return new DefaultMutableTreeNode(human.getType() + "   " + human.getName() + "   " + human.getGender() +
+                                            "   год родж: " + human.getYearOfBirth() + "   x:" + human.getX() +
+                                            "   y:" + human.getY() + "   состояние: " + human.getConditionInCommunity().getState() + "   ост. время: " +
+                                            human.getConditionInCommunity().getRemainingTime() + "   живой: " + human.isAlive());
     }
 
     private void addNode(DefaultMutableTreeNode node){
@@ -164,7 +177,6 @@ public class ServerWindow extends JFrame{
         mapOfNodes.clear();
 
         for(Object h : objects){
-            System.out.println( ((Human)h) );
             DefaultMutableTreeNode node = getNodeOfObject(h);
 
             mapOfNodes.put(node, (Human)h);
@@ -173,7 +185,6 @@ public class ServerWindow extends JFrame{
         }
 
         model.reload();
-        System.out.println(root.getChildCount() + "    " +  mapOfNodes.size());
     }
 
     class ButtonRemoveEventListener implements ActionListener{
@@ -212,6 +223,37 @@ public class ServerWindow extends JFrame{
         }
     }
 
+    class ButtonAddEventListener implements ActionListener{
+        public void actionPerformed(ActionEvent e) {
+            AddObjectWindow win = new AddObjectWindow(ServerWindow.this);
+            win.setVisible(true);
+            updateTree();
+        }
+    }
+
+    class ButtonEditActionListener implements ActionListener{
+        public void actionPerformed(ActionEvent e) {
+            DefaultTreeModel model = (DefaultTreeModel)tree.getModel();
+            DefaultMutableTreeNode root = (DefaultMutableTreeNode)model.getRoot();
+            TreePath[] paths = tree.getSelectionPaths();
+
+            if(paths == null){
+                labelInf.setText("Нужно выбрать элемент, чтобы изменить его");
+                return;
+            } else if(paths.length > 1){
+                labelInf.setText("Изменить можно только один элемент");
+                return;
+            }
+
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode)paths[0].getLastPathComponent();
+            Human h = mapOfNodes.get(node);
+
+            ChangeObjectWindow win = new ChangeObjectWindow(ServerWindow.this, h);
+            win.setVisible(true);
+
+            updateTree();
+        }
+    }
     class MenuItemSaveEventListener implements ActionListener{
         public void actionPerformed(ActionEvent e) {
             labelInf.setText(sheduler.getStorage().save());
@@ -242,4 +284,7 @@ public class ServerWindow extends JFrame{
             updateTree();
         }
     }
+
+
+
 }

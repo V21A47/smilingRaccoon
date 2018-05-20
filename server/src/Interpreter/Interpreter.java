@@ -50,11 +50,8 @@ public class Interpreter {
         Human human = null;
 
         if(!operand.equals("")){
-            System.out.println("trying!");
             human = gson.fromJson(operand, Human.class);
         }
-
-        //System.out.println(command + "\n" + operand + "\n" + path + "\n" + human);
 
         if (command.equals("remove_lower")){
             return storage.remove_lower(human);
