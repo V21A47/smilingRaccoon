@@ -8,10 +8,6 @@ class Server{
         String host = "localhost";
         int port = 8081;
 
-        LoginWindow loginWindow = new LoginWindow("resources/loginData");
-        loginWindow.setVisible(true);
-
-
         if(args.length == 2){
             host = args[0];
             port = Integer.parseInt(args[1]);
@@ -24,6 +20,8 @@ class Server{
         }
 
         Interpreter inter = new Interpreter(fileName);
+
+        Sheduler shed = new Sheduler("resources/loginData", inter);
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {

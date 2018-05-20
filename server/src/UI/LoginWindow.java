@@ -16,13 +16,15 @@ public class LoginWindow extends JFrame{
     private JPasswordField textFieldPassword = null;
     private JButton buttonEnter = null;
     private String fileName;
+    private Sheduler sheduler;
 
-    public LoginWindow(String dataFile){
+    public LoginWindow(Sheduler sheduler, String dataFile){
         super("LoginWindow");
 
         //JFrame.setDefaultLookAndFeelDecorated(true);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        this.sheduler = sheduler;
         fileName = dataFile;
 
 
@@ -186,16 +188,13 @@ public class LoginWindow extends JFrame{
             if(map.containsKey(name)){
                 if(map.get(name).equals(password)){
                     labelErrorWhileEnter.setText("Здравствуйте, " + name);
+                    sheduler.loginFinished(name);
                 } else {
                     labelErrorWhileEnter.setText("Ошибка в пароле.");
                 }
             } else {
                 labelErrorWhileEnter.setText("Такой пользователь не найден.");
             }
-
-
-
-
         }
     }
 }

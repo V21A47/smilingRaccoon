@@ -9,6 +9,10 @@ public class Interpreter {
     private CollectionStorage storage;
     private Gson gson;
 
+    public String getFileName(){
+        return fileName;
+    }
+
     public Interpreter(String fileName){
         this.fileName = fileName;
         gson = new Gson();
