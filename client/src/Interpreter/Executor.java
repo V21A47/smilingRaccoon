@@ -11,7 +11,7 @@ public class Executor{
     private int maxNumberOfCalls = 30;
 
     private String host = "localhost";
-    private int port = 3128;
+    private int port = 3129;
 
     private Socket socket = null;
 
@@ -33,7 +33,10 @@ public class Executor{
         return newSocket;
     }
 
-    public Executor(){
+    public Executor(String host, int port){
+        this.host = host;
+        this.port = port;
+
         try{
             socket = getSocket();
             if(socket == null){

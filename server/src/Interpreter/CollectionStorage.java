@@ -185,7 +185,7 @@ public class CollectionStorage {
                 if(t.length() < 10){
                     t = new String(t + "    ");
                 }
-                s.append(h.getName() +"\t"+ h.getAge() +"\t"+ h.getSizeValue() +"\t"+ t +"   "+ h.getX() +"\t"+ h.getY() + "\n");
+                s.append(h.getName() +"\t"+ h.getYearOfBirth() +"\t"+ h.getSizeValue() +"\t"+ t +"   "+ h.getX() +"\t"+ h.getY() + "\n");
             }
         }
 
@@ -250,17 +250,9 @@ public class CollectionStorage {
         bandit1.move(25, 25);
         bandit2.move(26, 25);
 
-        s.append(info());
-
-        policeman.move(-19, -19);
-        bandit1.move(-22, -22);
-        bandit2.move(-21, -22);
-
         s.append("И ловит их наконец!\n");
-
-        policeman.arrest(bandit1);
-        policeman.arrest(bandit2);
-
+        set.remove(bandit1);
+        set.remove(bandit2);
         s.append(info());
 
         return s.toString();

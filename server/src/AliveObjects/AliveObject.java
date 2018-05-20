@@ -4,31 +4,43 @@ import Places.SearchableThing;
 
 abstract public class AliveObject extends SearchableThing {
     private boolean isAlive = true;
-    private int age;
+    private int yearOfBirth;
 
-    public AliveObject(String name, int age, double sizeValue, int x, int y){
-        this(name, age, sizeValue);
+    public AliveObject(String name, int yearOfBirth, double sizeValue, int x, int y){
+        this(name, yearOfBirth, sizeValue);
         this.move(x, y);
     }
-    
-    public AliveObject(String name, int age, double sizeValue){
+
+    public AliveObject(String name, int yearOfBirth, double sizeValue){
         super(sizeValue, name);
-        this.age = age;
+        this.yearOfBirth = yearOfBirth;
     }
 
-    public int getAge(){
-        return age;
+    @Override
+    public boolean move(int x, int y){
+        if(isAlive == false){
+            return false;
+        }
+
+        if(x < -1000 || x > 1000 || y < -1000 || y > 1000){
+            return false;
+        }
+
+        return super.move(x, y);
     }
 
-    public void setAge(int age){
-        if(!(age <=0) ){
-            this.age = age;
+    public boolean setYearOfBirth(int yearOfBirth){
+        if(!(yearOfBirth <=0) ){
+            this.yearOfBirth = yearOfBirth;
+            return true;
         } else {
-            System.out.println("!");
-            this.age=42;
+            return false;
         }
     }
 
+    public int getYearOfBirth(){
+        return yearOfBirth;
+    }
 
     public boolean isAlive() {
         return isAlive;
@@ -42,7 +54,7 @@ abstract public class AliveObject extends SearchableThing {
     public int hashCode(){
         int hC = getName().length();
         hC += (int)(this.getSizeValue()*10000 + this.getSizeValue());
-        hC += age;
+        hC += yearOfBirth;
         if(isAlive){
             hC += 10000;
         } else {
@@ -55,7 +67,7 @@ abstract public class AliveObject extends SearchableThing {
     public boolean equals(Object object){
         return  object instanceof AliveObject &&
                 ((AliveObject) object).isAlive() == isAlive &&
-                ((AliveObject) object).getAge() == this.age &&
+                ((AliveObject) object).getYearOfBirth() == this.yearOfBirth &&
                 ((AliveObject) object).getName().equals(getName()) &&
                 ((AliveObject) object).getSizeValue() == this.getSizeValue();
     }

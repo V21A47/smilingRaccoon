@@ -12,8 +12,8 @@ class Parser{
     private HashSet<String> setOfCommandsWithOperand = new HashSet<>();
     private Executor exec;
 
-    public Parser(){
-        exec = new Executor();
+    public Parser(String host, int port){
+        exec = new Executor(host, port);
         setOfCommandsWithOperand.add("remove_greater");
         setOfCOmmandsWithoutOperand.add("save");
         setOfCOmmandsWithoutOperand.add("story");

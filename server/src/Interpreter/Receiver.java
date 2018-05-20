@@ -16,10 +16,13 @@ public class Receiver extends Thread{
     private Interpreter interpreter = null;
 
     private String host = "localhost";
-    private int port = 3128;
+    private int port = 3129;
 
 
-    public Receiver(Interpreter inter){
+    public Receiver(Interpreter inter, String host, int port){
+        this.host = host;
+        this.port = port;
+
         interpreter = inter;
 
         try{

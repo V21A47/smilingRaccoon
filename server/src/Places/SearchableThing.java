@@ -5,7 +5,7 @@ public abstract class SearchableThing{
     private String name;
     private int x;
     private int y;
-    
+
     public SearchableThing(double sizeValue){
         if(sizeValue < 0.0D){
             this.sizeValue = 0.0D;
@@ -19,7 +19,7 @@ public abstract class SearchableThing{
         this.x = x;
         this.y = y;
     }
-    
+
     public SearchableThing(double sizeValue, String name){
         if(sizeValue < 0.0D){
             this.sizeValue = 0.0D;
@@ -32,16 +32,17 @@ public abstract class SearchableThing{
     public int getX(){
         return x;
     }
-    
+
     public int getY(){
         return y;
     }
-    
-    public void move(int x, int y){
+
+    public boolean move(int x, int y){
         this.x = x;
         this.y = y;
+        return true;
     }
-    
+
     public void setName(String name){
         this.name = name;
     }
