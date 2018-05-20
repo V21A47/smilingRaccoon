@@ -9,17 +9,35 @@ public class Sheduler{
     private LoginWindow loginWindow = null;
     private ServerWindow serverWindow = null;
 
+    private CollectionStorage storage;
     private Interpreter interpreter = null;
+
     private String fileName;
     private String userName;
 
-    public Sheduler(String fileName, Interpreter interpreter){
+    public Sheduler(String savingDataFileName, String fileName){
         this.fileName = fileName;
-        this.interpreter = interpreter;
+        this.storage = new CollectionStorage("Storage", fileName);
+        this.interpreter = new Interpreter(this, savingDataFileName, storage);
+        this.interpreter.loadData();
+
         if(interpreter == null){
             System.err.println("ERRORRORO");
         }
         startLogin();
+        loginFinished("testing");
+    }
+
+    public void updateTree(){
+        serverWindow.updateTree();
+    }
+
+    public CollectionStorage getStorage(){
+        return storage;
+    }
+
+    public Interpreter getInterpreter(){
+        return interpreter;
     }
 
     private void startLogin(){

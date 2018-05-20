@@ -35,6 +35,11 @@ public class CollectionStorage {
 
     }
 
+    public Object[] getArrayOfHumans(){
+        System.out.println("CS: size = " + set.size());
+        return set.toArray();
+    }
+
     public String getName(){return name;}
 
     /**

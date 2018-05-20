@@ -18,21 +18,18 @@ class Server{
             System.err.println("Environment variable was not set. Use \"dataFile\" instead of it");
             fileName = "dataFile";
         }
+        Sheduler shed = new Sheduler(fileName, "resources/loginData");
 
-        Interpreter inter = new Interpreter(fileName);
 
-        Sheduler shed = new Sheduler("resources/loginData", inter);
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
-                inter.saveData();
+                shed.getInterpreter().saveData();
             }
         });
 
 
-        inter.loadData();
-
-        Receiver r = new Receiver(inter, host, port);
+        Receiver r = new Receiver(shed.getInterpreter(), host, port);
 
     }
 }

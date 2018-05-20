@@ -27,79 +27,82 @@ public class LoginWindow extends JFrame{
         this.sheduler = sheduler;
         fileName = dataFile;
 
+        {// Initializing objects
+            labelUserName = new JLabel("Username");
 
-        labelUserName = new JLabel("Username");
+            labelUserName.setMaximumSize(new Dimension(80, 20));
+            labelUserName.setMinimumSize(new Dimension(80, 20));
 
-        labelUserName.setMaximumSize(new Dimension(80, 20));
-        labelUserName.setMinimumSize(new Dimension(80, 20));
+            labelPassword = new JLabel("Password");
+            labelPassword.setMaximumSize(new Dimension(80, 20));
+            labelPassword.setMinimumSize(new Dimension(80, 20));
 
-        labelPassword = new JLabel("Password");
-        labelPassword.setMaximumSize(new Dimension(80, 20));
-        labelPassword.setMinimumSize(new Dimension(80, 20));
+            labelErrorWhileEnter = new JLabel();
+            labelErrorWhileEnter.setMaximumSize(new Dimension(270, 20));
+            labelErrorWhileEnter.setMinimumSize(new Dimension(270, 20));
 
-        labelErrorWhileEnter = new JLabel();
-        labelErrorWhileEnter.setMaximumSize(new Dimension(270, 20));
-        labelErrorWhileEnter.setMinimumSize(new Dimension(270, 20));
+            textFieldUserName = new JTextField();
+            textFieldUserName.setMaximumSize(new Dimension(120, 20));
+            textFieldUserName.setMinimumSize(new Dimension(120, 20));
 
-        textFieldUserName = new JTextField();
-        textFieldUserName.setMaximumSize(new Dimension(120, 20));
-        textFieldUserName.setMinimumSize(new Dimension(120, 20));
+            textFieldPassword = new JPasswordField();
+            textFieldPassword.setMaximumSize(new Dimension(120, 20));
+            textFieldPassword.setMinimumSize(new Dimension(120, 20));
 
-        textFieldPassword = new JPasswordField();
-        textFieldPassword.setMaximumSize(new Dimension(120, 20));
-        textFieldPassword.setMinimumSize(new Dimension(120, 20));
-
-        buttonEnter = new JButton("Enter");
-        buttonEnter.setMaximumSize(new Dimension(80, 20));
-        buttonEnter.setMinimumSize(new Dimension(80, 20));
+            buttonEnter = new JButton("Enter");
+            buttonEnter.setMaximumSize(new Dimension(80, 20));
+            buttonEnter.setMinimumSize(new Dimension(80, 20));
+        }
 
         GroupLayout layout = new GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
+        {// Layout&beeeee
+            getContentPane().setLayout(layout);
+            layout.setHorizontalGroup(layout.createParallelGroup()
+                .addGroup(layout.createSequentialGroup()
+                    .addGap(0, 250, 900)
+                    .addComponent(labelUserName)
+                    .addGap(10)
+                    .addComponent(textFieldUserName)
+                    .addGap(0, 250, 900)
+                )
+                .addGroup(layout.createSequentialGroup()
+                    .addGap(0, 250, 900)
+                    .addComponent(labelPassword)
+                    .addGap(10)
+                    .addComponent(textFieldPassword)
+                    .addGap(0, 250, 900)
+                )
+                .addGroup(layout.createSequentialGroup()
+                    .addGap(0, 380, 900)
+                    .addComponent(buttonEnter)
+                    .addGap(0, 250, 900)
+                )
+                .addGroup(layout.createSequentialGroup()
+                    .addGap(0, 250, 900)
+                    .addComponent(labelErrorWhileEnter)
+                    .addGap(0, 250, 900)
+                )
+            );
 
-        layout.setHorizontalGroup(layout.createParallelGroup()
-            .addGroup(layout.createSequentialGroup()
-                .addGap(0, 250, 900)
-                .addComponent(labelUserName)
+            layout.setVerticalGroup(layout.createSequentialGroup()
+                .addGap(0, 350, 500)
+                .addGroup(layout.createParallelGroup()
+                    .addComponent(labelUserName)
+                    .addComponent(textFieldUserName)
+                )
+                .addGroup(layout.createParallelGroup()
+                    .addComponent(labelPassword)
+                    .addComponent(textFieldPassword)
+                )
                 .addGap(10)
-                .addComponent(textFieldUserName)
-                .addGap(0, 250, 900)
-            )
-            .addGroup(layout.createSequentialGroup()
-                .addGap(0, 250, 900)
-                .addComponent(labelPassword)
-                .addGap(10)
-                .addComponent(textFieldPassword)
-                .addGap(0, 250, 900)
-            )
-            .addGroup(layout.createSequentialGroup()
-                .addGap(0, 380, 900)
                 .addComponent(buttonEnter)
-                .addGap(0, 250, 900)
-            )
-            .addGroup(layout.createSequentialGroup()
-                .addGap(0, 250, 900)
                 .addComponent(labelErrorWhileEnter)
-                .addGap(0, 250, 900)
-            )
-        );
-
-        layout.setVerticalGroup(layout.createSequentialGroup()
-            .addGap(0, 350, 500)
-            .addGroup(layout.createParallelGroup()
-                .addComponent(labelUserName)
-                .addComponent(textFieldUserName)
-            )
-            .addGroup(layout.createParallelGroup()
-                .addComponent(labelPassword)
-                .addComponent(textFieldPassword)
-            )
-            .addGap(10)
-            .addComponent(buttonEnter)
-            .addComponent(labelErrorWhileEnter)
-            .addGap(0, 350, 500)
-        );
+                .addGap(0, 350, 500)
+            );
+        }
 
         buttonEnter.addActionListener(new EnterEventListener());
+
         pack();
         this.setBounds(100, 100, 1200, 900);
     }

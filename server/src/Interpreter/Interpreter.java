@@ -2,22 +2,23 @@ package Interpreter;
 
 import AliveObjects.Human;
 import com.google.gson.Gson;
-
+import UI.*;
 
 public class Interpreter {
     private String fileName;
-    private CollectionStorage storage;
     private Gson gson;
+    private CollectionStorage storage;
+    private Sheduler sheduler;
 
     public String getFileName(){
         return fileName;
     }
 
-    public Interpreter(String fileName){
+    public Interpreter(Sheduler sheduler, String fileName, CollectionStorage storage){
         this.fileName = fileName;
+        this.sheduler = sheduler;
         gson = new Gson();
-
-        storage = new CollectionStorage("Main storage", fileName);
+        this.storage = storage;
     }
 
     public void saveData(){
@@ -66,7 +67,9 @@ public class Interpreter {
         } else if(command.equals("add_if_min")){
             return storage.add_if_min(human);
         } else if(command.equals("add")){
-            return storage.add(human);
+            String answer = storage.add(human);
+            sheduler.updateTree();
+            return answer;
         } else if(command.equals("import")){
             return storage.importFromFile(path);
         } else if(command.equals("load")){
