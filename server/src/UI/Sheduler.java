@@ -17,7 +17,7 @@ public class Sheduler{
 
     public Sheduler(String savingDataFileName, String fileName){
         this.fileName = fileName;
-        this.storage = new CollectionStorage("Storage", fileName);
+        this.storage = new CollectionStorage("Storage", savingDataFileName);
         this.interpreter = new Interpreter(this, savingDataFileName, storage);
         this.interpreter.loadData();
 

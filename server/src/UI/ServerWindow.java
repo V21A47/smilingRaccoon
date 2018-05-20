@@ -19,6 +19,7 @@ public class ServerWindow extends JFrame{
     private JButton buttonEdit = null;
     private JTree tree = null;
     private JScrollPane treeScroll = null;
+    private JLabel labelInf = null;
 
     private JMenuBar menuBar = null;
     private JMenu menu = null;
@@ -71,6 +72,10 @@ public class ServerWindow extends JFrame{
             buttonEdit.setMaximumSize(new Dimension(120, 20));
             buttonEdit.setMinimumSize(new Dimension(120, 20));
 
+            labelInf = new JLabel();
+            labelInf.setMaximumSize(new Dimension(500, 20));
+            labelInf.setMinimumSize(new Dimension(250, 20));
+
             DefaultMutableTreeNode root = new DefaultMutableTreeNode("Collection");
 
             tree = new JTree(root);
@@ -85,9 +90,6 @@ public class ServerWindow extends JFrame{
 
             tree.setMinimumSize(new Dimension(800, 300));
             tree.setMaximumSize(new Dimension(1900, 1200));
-
-
-
         }
 
         {// Layout&bee
@@ -102,6 +104,8 @@ public class ServerWindow extends JFrame{
                     .addComponent(buttonEdit)
                     .addGap(10)
                     .addComponent(buttonRemove)
+                    .addGap(80)
+                    .addComponent(labelInf)
                     .addGap(0, 250, 1200)
                 )
                 .addGroup(layout.createSequentialGroup()
@@ -117,6 +121,7 @@ public class ServerWindow extends JFrame{
                     .addComponent(buttonAdd)
                     .addComponent(buttonEdit)
                     .addComponent(buttonRemove)
+                    .addComponent(labelInf)
                 )
                 .addGap(0, 15, 15)
                 .addComponent(tree)
@@ -127,7 +132,10 @@ public class ServerWindow extends JFrame{
 
         {// Events
             buttonRemove.addActionListener(new ButtonRemoveEventListener());
-
+            menuItemSave.addActionListener(new MenuItemSaveEventListener());
+            menuItemLoad.addActionListener(new MenuItemLoadEventListener());
+            menuItemImport.addActionListener(new MenuItemImportEventListener());
+            menuItemClear.addActionListener(new MenuItemClearEventListener());
         }
 
         pack();
@@ -150,44 +158,48 @@ public class ServerWindow extends JFrame{
 
     public void updateTree(){
         Object[] objects = sheduler.getStorage().getArrayOfHumans();
-        //System.out.println(objects.length);
         DefaultTreeModel model = (DefaultTreeModel)tree.getModel();
         DefaultMutableTreeNode root = (DefaultMutableTreeNode)model.getRoot();
-
         root.removeAllChildren();
-
         mapOfNodes.clear();
 
         for(Object h : objects){
+            System.out.println( ((Human)h) );
             DefaultMutableTreeNode node = getNodeOfObject(h);
 
             mapOfNodes.put(node, (Human)h);
 
             addNode(node);
         }
+
+        model.reload();
+        System.out.println(root.getChildCount() + "    " +  mapOfNodes.size());
     }
 
     class ButtonRemoveEventListener implements ActionListener{
         public void actionPerformed(ActionEvent e) {
+            labelInf.setText("");
             try{
                 DefaultTreeModel model = (DefaultTreeModel)tree.getModel();
                 DefaultMutableTreeNode root = (DefaultMutableTreeNode)model.getRoot();
                 TreePath[] paths = tree.getSelectionPaths();
+
+                if(paths == null){
+                    labelInf.setText("Нужно выбрать элементы, чтобы удалить их.");
+                    return;
+                }
 
                 for(TreePath path : paths){
                     try{
                         DefaultMutableTreeNode node = (DefaultMutableTreeNode)path.getLastPathComponent();
                         Human h = mapOfNodes.get(node);
                         mapOfNodes.remove(node);
-                        //System.out.println("SW: size of map = " + mapOfNodes.size());
-                        //System.out.println("SW: deleting " + h);
                         sheduler.getStorage().remove(h);
                         root.remove(node);
                     } catch (NullPointerException error){
                         return;
                     }
                 }
-                model.reload();
                 updateTree();
 
             } catch (java.lang.IllegalArgumentException error){
@@ -200,4 +212,34 @@ public class ServerWindow extends JFrame{
         }
     }
 
+    class MenuItemSaveEventListener implements ActionListener{
+        public void actionPerformed(ActionEvent e) {
+            labelInf.setText(sheduler.getStorage().save());
+            updateTree();
+        }
+    }
+
+    class MenuItemLoadEventListener implements ActionListener{
+        public void actionPerformed(ActionEvent e) {
+            labelInf.setText(sheduler.getStorage().load());
+            updateTree();
+        }
+    }
+
+    class MenuItemClearEventListener implements ActionListener{
+        public void actionPerformed(ActionEvent e) {
+            labelInf.setText(sheduler.getStorage().clear());
+            updateTree();
+        }
+    }
+
+    class MenuItemImportEventListener implements ActionListener{
+        public void actionPerformed(ActionEvent e) {
+            labelInf.setText("");
+            String fileName = JOptionPane.showInputDialog("Введите имя файла");
+
+            labelInf.setText(sheduler.getStorage().importFromFile(fileName));
+            updateTree();
+        }
+    }
 }

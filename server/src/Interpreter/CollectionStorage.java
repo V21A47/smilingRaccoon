@@ -160,13 +160,13 @@ public class CollectionStorage {
         int size = set.size();
 
         if(humans == null){
-            return ("No data was loaded from the file.");
+            return ("Из файла " + fileName + " ничего не было загружено. Файл пуст");
         } else {
             set.addAll(humans);
             if(size == set.size()){
-                return("No data was loaded from the file.");
+                return("В файле нет новых объектов");
             }else{
-                return ("Some objects were loaded from a file " + fileName);
+                return ("Из файла " + fileName + " были загружены новые объекты");
             }
         }
     }
@@ -205,7 +205,7 @@ public class CollectionStorage {
         CSVManager.clearFile(fileName);
         set.stream().forEach( (p) -> CSVManager.writeToFile(p, fileName));
 
-        return("The collection was saved to the file " + fileName);
+        return("Коллекция была сохранена в файл " + fileName);
     }
 
     /**
@@ -213,7 +213,7 @@ public class CollectionStorage {
      */
     public String clear(){
         set.clear();
-        return("All elements were deleted from the collection");
+        return("Из коллекции удалены все элементы");
     }
 
     /**
@@ -223,9 +223,9 @@ public class CollectionStorage {
         set.clear();
         importFromFile(fileName);
         if(set.size() > 0){
-            return ("Some objects were loaded from a file " + fileName);
+            return ("Данные загружены из файла " + fileName);
         } else {
-            return ("No objects were loaded from a file " + fileName);
+            return ("Из файла " + fileName + " ничего не было загружено" );
         }
     }
 
