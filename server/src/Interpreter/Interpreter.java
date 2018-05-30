@@ -14,6 +14,10 @@ public class Interpreter {
         return fileName;
     }
 
+    protected CollectionStorage getStorage(){
+        return storage;
+    }
+
     public Interpreter(Sheduler sheduler, String fileName, CollectionStorage storage){
         this.fileName = fileName;
         this.sheduler = sheduler;

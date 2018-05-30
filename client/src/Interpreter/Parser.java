@@ -7,13 +7,13 @@ import com.google.gson.JsonSyntaxException;
 import java.util.HashSet;
 import java.util.ArrayList;
 
-class Parser{
+public class Parser{
     private HashSet<String> setOfCOmmandsWithoutOperand = new HashSet<>();
     private HashSet<String> setOfCommandsWithOperand = new HashSet<>();
-    private Executor exec;
+    private Executor executor;
 
-    public Parser(String host, int port){
-        exec = new Executor(host, port);
+    public Parser(Executor executor){
+        this.executor = executor;
         setOfCommandsWithOperand.add("remove_greater");
         setOfCOmmandsWithoutOperand.add("save");
         setOfCOmmandsWithoutOperand.add("story");
@@ -72,19 +72,19 @@ class Parser{
             }
 
             if(command.equals("import")){
-                exec.execute(command, operand);
+                executor.execute(command, operand);
             } else {
                 Human humanObject = null;
                 humanObject = parseJson(operand);
 
                 if(humanObject != null){
                                         // was humanObject
-                    exec.execute(command, operand);
+                    executor.execute(command, operand);
                 }
             }
 
         } else if(setOfCOmmandsWithoutOperand.contains(command)){
-            exec.execute(command, null);
+            executor.execute(command, null);
         }
     }
 

@@ -1,11 +1,14 @@
 package AliveObjects;
 
 import Places.SearchableThing;
+import java.io.Serializable;
 
-abstract public class AliveObject extends SearchableThing {
+abstract public class AliveObject extends SearchableThing implements Serializable {
     private boolean isAlive = true;
     private int yearOfBirth;
 
+    public AliveObject(){
+    }
     public AliveObject(String name, int yearOfBirth, double sizeValue, int x, int y){
         this(name, yearOfBirth, sizeValue);
         this.move(x, y);

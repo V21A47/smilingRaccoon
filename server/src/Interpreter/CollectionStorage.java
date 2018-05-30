@@ -17,10 +17,12 @@ import java.util.NoSuchElementException;
  * Реализует работу с коллекцией.
  *
  */
+
 public class CollectionStorage {
     private String name;
     private String fileName;
     private ConcurrentSkipListSet<Human> set = new ConcurrentSkipListSet<>(new Human.HumanComparator());
+    private boolean isUpdated = false;
 
     public boolean isEmpty(){
         return set.isEmpty();
@@ -33,6 +35,22 @@ public class CollectionStorage {
         this.name = name;
         this.fileName = fileName;
 
+    }
+
+    public boolean isIn(Human human){
+        return set.contains(human);
+    }
+
+    public boolean isUpdated(){
+        return isUpdated;
+    }
+
+    public void setUpdated(){
+        isUpdated = false;
+    }
+
+    public ConcurrentSkipListSet getSet(){
+        return set;
     }
 
     public Object[] getArrayOfHumans(){
@@ -51,6 +69,7 @@ public class CollectionStorage {
         if(!set.remove(element)){
             return (element + " can't be removed from the collection.");
         } else {
+            isUpdated = true;
             return (element + " was deleted");
         }
     }
@@ -68,6 +87,7 @@ public class CollectionStorage {
         if(size == set.size()){
             return ("No elements which are greater than " + element);
         } else {
+            isUpdated = true;
             return ("Elements which are greater than " + element + " were deleted.");
         }
     }
@@ -85,6 +105,7 @@ public class CollectionStorage {
         if(size == set.size()){
             return ("No elements which are lower than " + element);
         } else {
+            isUpdated = true;
             return ("Elements which are lower than " + element + " were deleted.");
         }
     }
@@ -99,6 +120,7 @@ public class CollectionStorage {
         if (!set.add(element)) {
             return (element + " can't be added to the collection.");
         } else {
+            isUpdated = true;
             return (element + " was added to the collection.");
         }
     }
@@ -121,7 +143,9 @@ public class CollectionStorage {
         if(size == set.size()){
             return (element + " can't be added to the collection.");
         } else {
+            isUpdated = true;
             return (element + " was added to the collection.");
+
         }
     }
 
@@ -143,7 +167,9 @@ public class CollectionStorage {
         if(size == set.size()){
             return (element + " can't be added to the collection.");
         } else {
+            isUpdated = true;
             return (element + " was added to the collection.");
+
         }
     }
 
@@ -159,13 +185,15 @@ public class CollectionStorage {
         int size = set.size();
 
         if(humans == null){
-            return ("Из файла " + fileName + " ничего не было загружено. Файл пуст");
+            return ("Из файла " + fileName + " ничего не было загружено");
         } else {
             set.addAll(humans);
             if(size == set.size()){
                 return("В файле нет новых объектов");
             }else{
+                isUpdated = true;
                 return ("Из файла " + fileName + " были загружены новые объекты");
+
             }
         }
     }
@@ -212,7 +240,9 @@ public class CollectionStorage {
      */
     public String clear(){
         set.clear();
+        isUpdated = true;
         return("Из коллекции удалены все элементы");
+
     }
 
     /**
@@ -222,6 +252,7 @@ public class CollectionStorage {
         set.clear();
         importFromFile(fileName);
         if(set.size() > 0){
+            isUpdated = true;
             return ("Данные загружены из файла " + fileName);
         } else {
             return ("Из файла " + fileName + " ничего не было загружено" );
@@ -258,7 +289,7 @@ public class CollectionStorage {
         set.remove(bandit1);
         set.remove(bandit2);
         s.append(info());
-
+        isUpdated = true;
         return s.toString();
     }
 }

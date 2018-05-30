@@ -7,11 +7,16 @@ import java.io.IOException;
 public class Reader{
     private boolean shouldWork = true;
 
-    public void go(String host, int port) throws IOException{
+    private Executor executor;
+    public Reader(Executor executor){
+        this.executor = executor;
+    }
+
+    public void go() throws IOException{
         InputStreamReader reader = new InputStreamReader(System.in);
         StringBuilder string = new StringBuilder();
 
-        Parser parser = new Parser(host, port);
+        Parser parser = new Parser(executor);
 
         int bracketsAmount = 0;
 

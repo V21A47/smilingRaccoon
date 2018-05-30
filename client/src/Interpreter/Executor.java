@@ -3,98 +3,149 @@ package Interpreter;
 import AliveObjects.Human;
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
+import java.util.HashSet;
 
+import UI.*;
 
-public class Executor{
-
-    private int numberOfCalls = 0;
-    private int maxNumberOfCalls = 30;
-
+public class Executor extends Thread{
     private String host = "localhost";
     private int port = 3129;
 
+    private InputStream is;
+    private OutputStream os;
+    private Sheduler sheduler;
+
     private Socket socket = null;
+    private boolean shouldWork = true;
 
-    private Socket getSocket() throws InterruptedException{
-        if(numberOfCalls == maxNumberOfCalls){
-            return null;
-        }
+    private HashSet<Human> set;
 
+    private Socket getSocket() {
         Socket newSocket = null;
         try{
             newSocket = new Socket(host, port);
+            is = newSocket.getInputStream();
+            os = newSocket.getOutputStream();
+
         } catch (IOException e){
-            Thread.sleep(500);
-            numberOfCalls+=1;
+            try{
+                Thread.sleep(500);
+            } catch (InterruptedException er){
+                System.err.println(er);
+                return null;
+            }
             newSocket = getSocket();
         }
 
-        numberOfCalls = 0;
+
         return newSocket;
     }
 
-    public Executor(String host, int port){
+    public Executor(Sheduler sheduler, String host, int port){
         this.host = host;
         this.port = port;
+        set = new HashSet<Human>();
 
-        try{
-            socket = getSocket();
+        this.sheduler = sheduler;
+        start();
+    }
+
+    public void run(){
+        while(shouldWork){
             if(socket == null){
-                System.err.println("Server is not available");
-                System.exit(1);
+                socket = getSocket();
             }
-        } catch (InterruptedException e){
-            System.err.println(e);
+
+            if(sheduler.getClientWindow() != null){
+                sheduler.getClientWindow().changeTitle(" connected");
+            }
+
+            execute(null, null);
+
+            try{
+                Thread.sleep(100);
+            } catch (InterruptedException e){
+                System.err.println(e);
+                return;
+            }
         }
+    }
+
+    public Sheduler getSheduler(){
+        return sheduler;
+    }
+
+    private boolean send(Serializable obj) throws IOException{
+        ByteArrayOutputStream baos = new  ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+
+        oos.writeObject(obj);
+        oos.flush();
+
+        byte [] serObj = baos.toByteArray();
+
+        os.write(serObj);
+
+        return true;
+    }
+
+    private Object receive() throws IOException, ClassNotFoundException{
+            byte [] serializedObject = new byte[1024*64];
+            is.read(serializedObject);
+            ByteArrayInputStream bis = new ByteArrayInputStream(serializedObject);
+            ObjectInputStream ois = new ObjectInputStream(bis);
+
+            return ois.readObject();
     }
 
     public void execute(String command, String operand){
         try{
-            // Send
-            String message = "";
+            send(new Byte( (byte)1 ));
 
-            if(operand == null){
-                message = command;
-            } else {
-                message = new String(command + " " + operand);
-            }
+            Byte answer = (Byte)receive();
 
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(bos);
+            //System.out.println("answer: " + answer.byteValue());
 
-            oos.writeObject(message);
-            oos.flush();
+            if(answer != null){
+                switch(answer.byteValue()){
+                    case 0:
+                        //System.out.println("Got command: 0");
+                        return;
 
-            byte [] serializedObject = bos.toByteArray();
-            String amount = String.valueOf(serializedObject.length);
+                    case 1:
+                        // Add an object
+                        //System.out.println("Got command: 1");
+                        send(new Byte( (byte)1));
+                        Human human = (Human)receive();
+                        send(new Byte( (byte)1));
+                        System.out.println("Command 1: " + human);
+                        set.add(human);
+                        return;
 
-            socket.getOutputStream().write(serializedObject);
-
-
-            Thread.sleep(25);
-
-
-            // Receive
-            serializedObject = new byte[1024];
-            socket.getInputStream().read(serializedObject);
-            ByteArrayInputStream bis = new ByteArrayInputStream(serializedObject);
-            ObjectInputStream ois = new ObjectInputStream(bis);
-            Object obj = ois.readObject();
-            String str = (String)obj;
-            System.out.println(str);
-
-
-        } catch (ConnectException|StreamCorruptedException e){
-            System.err.println("Server is not available now");
-            try{
-                socket = getSocket();
-                if(socket == null){
-                    System.err.println("Server is not available");
-                    System.exit(1);
+                    case 2:
+                        // Delete an object
+                        //System.out.println("Got command: 2");
+                        send(new Byte( (byte)1));
+                        human = (Human)receive();
+                        send(new Byte( (byte)1));
+                        System.out.println("Command 2: " + human);
+                        set.remove(human);
+                        return;
                 }
-            } catch (InterruptedException ex){
-                System.err.println(ex);
+            } else {
+                System.out.println("Got null!");
             }
+
+        } catch (IOException er){
+            if(sheduler.getClientWindow() != null &&
+                        sheduler.getClientWindow().getTitle().equals(" is not connected now!") == false){
+                sheduler.getClientWindow().changeTitle(" is not connected now!");
+            }
+            socket = null;
+
+        } catch (ClassNotFoundException e){
+            System.err.println(e);
         } catch (Exception e){
             System.err.println(e);
         }

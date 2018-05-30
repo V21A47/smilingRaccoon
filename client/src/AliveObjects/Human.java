@@ -1,20 +1,27 @@
 package AliveObjects;
 
+import java.io.Serializable;
 import Groups.IllegalGroupOperation;
 import Places.Searchable;
+import java.util.Comparator;
 
-public class Human extends AliveObject implements Speakable, Searchable, Comparable {
-    private HumanType type;
-    private int yearOfBirth;
+public class Human extends AliveObject implements Speakable, Searchable, Comparable, Serializable {
+    private HumanType type = HumanType.NORMAL;
     public ConditionInCommunity condition;
+    private String gender = "male";
 
-    public static class ConditionInCommunity{
-        private double publicAcceptance;
+    public String getGender(){
+        return gender;
+    }
+
+    public Human(){
+        }
+
+    public static class ConditionInCommunity implements Serializable{
         private StateOfFreedom state;
         private int remainingTime;
 
-        public ConditionInCommunity(double acceptance, StateOfFreedom state, int time){
-            publicAcceptance = acceptance;
+        public ConditionInCommunity(StateOfFreedom state, int time){
             this.state = state;
             remainingTime = time;
         }
@@ -25,10 +32,6 @@ public class Human extends AliveObject implements Speakable, Searchable, Compara
 
         public int getRemainingTime(){
             return remainingTime;
-        }
-
-        public double getPublicAcceptance(){
-            return publicAcceptance;
         }
 
         @Override
@@ -43,23 +46,27 @@ public class Human extends AliveObject implements Speakable, Searchable, Compara
         }
     }
 
-    public Human(String name, int age, HumanType type, int x, int y){
-        super(name, age, 80.0D, x, y);
-        this.yearOfBirth = 2018 - age;
-        this.type = type;
-        condition = new ConditionInCommunity(1.0D, StateOfFreedom.FREE, -1);
-    }
-    
-    public Human(String name, int age, HumanType type){
-        super(name, age, 80.0D);
-        this.yearOfBirth = 2018 - age;
-        this.type = type;
-        condition = new ConditionInCommunity(1.0D, StateOfFreedom.FREE, -1);
+    public static class HumanComparator implements Comparator<Human>{
+        @Override
+        public int compare(Human a, Human b){
+            return(a.compareTo(b));
+        }
     }
 
-    public Human(String name, int age){
-        this(name, age, HumanType.NORMAL);
-        this.yearOfBirth = 2018 - age;
+    public Human(String name, int yearOfBirth, HumanType type, int x, int y){
+        super(name, yearOfBirth, 80.0D, x, y);
+        this.type = type;
+        condition = new ConditionInCommunity(StateOfFreedom.FREE, -1);
+    }
+
+    public Human(String name, int yearOfBirth, HumanType type){
+        super(name, yearOfBirth, 80.0D);
+        this.type = type;
+        condition = new ConditionInCommunity(StateOfFreedom.FREE, -1);
+    }
+
+    public Human(String name, int yearOfBirth){
+        this(name, yearOfBirth, HumanType.NORMAL);
     }
 
     @Override
@@ -69,9 +76,9 @@ public class Human extends AliveObject implements Speakable, Searchable, Compara
         }
 
         Human human = (Human)(obj);
-        double result = Math.pow((this.getX()*this.getX()) + (this.getY()*this.getY()), 1/2) -
-                        Math.pow((human.getX()*human.getX()) + (human.getY()*human.getY()), 1/2);
-            
+        double result = Math.sqrt((this.getX()*this.getX()) + (this.getY()*this.getY())) -
+                        Math.sqrt((human.getX()*human.getX()) + (human.getY()*human.getY()));
+
         if( result < 0 ){
             return -1;
         } else if ( result == 0){
@@ -87,21 +94,16 @@ public class Human extends AliveObject implements Speakable, Searchable, Compara
         return type;
     }
 
-    public int getYearOfBirth(){
-        return yearOfBirth;
-    }
-        
     public ConditionInCommunity getConditionInCommunity(){return condition;}
 
     public void setState(LawDefender changer, ConditionInCommunity state) {
-        this.condition = new ConditionInCommunity(state.getPublicAcceptance(), state.getState(), state.getRemainingTime());
+        this.condition = new ConditionInCommunity(state.getState(), state.getRemainingTime());
     }
 
     @Override
     public int hashCode(){
         int hC = this.getName().hashCode();
-        hC += this.getAge();
-        hC += this.yearOfBirth;
+        hC += this.getYearOfBirth();
         switch (type){
             case NORMAL: hC += 1000; break;
             case POLICE: hC += 2000; break;
@@ -126,8 +128,9 @@ public class Human extends AliveObject implements Speakable, Searchable, Compara
     @Override
     public boolean equals(Object object) {
         return object instanceof Human && ((Human) object).isAlive() == this.isAlive() &&
-                ((Human) object).getAge() == this.getAge() && ((Human) object).getName().equals(this.getName()) &&
-                ((Human) object).condition.getState() == condition.getState() && ((Human) object).type == type;
+                ((Human) object).getYearOfBirth() == this.getYearOfBirth() && ((Human) object).getName().equals(this.getName()) &&
+                ((Human) object).condition.getState() == condition.getState() && ((Human) object).type == type &&
+                ((Human) object).getX() == this.getX() && ((Human) object).getY() == this.getY();
     }
 
     @Override

@@ -9,6 +9,12 @@ import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.ConnectException;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
+
+import AliveObjects.*;
 
 
 public class Receiver extends Thread{
@@ -18,12 +24,15 @@ public class Receiver extends Thread{
     private String host = "localhost";
     private int port = 3129;
 
+    private HashSet<Human> set;
 
     public Receiver(Interpreter inter, String host, int port){
         this.host = host;
         this.port = port;
 
         interpreter = inter;
+
+        set = new HashSet<>();
 
         try{
             ServerSocketChannel ssc = ServerSocketChannel.open();
@@ -44,6 +53,39 @@ public class Receiver extends Thread{
         start();
     }
 
+
+    private void send(Serializable obj) throws ConnectException, InterruptedException{
+        try{
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ObjectOutputStream oos=new ObjectOutputStream(bos);
+            oos.writeObject(obj);
+            oos.flush();
+            byte[] serializedObject = bos.toByteArray();
+            sc.write(ByteBuffer.wrap(serializedObject));
+
+            Thread.sleep(10);
+        } catch (IOException e){
+            System.err.println(e);
+            throw new ConnectException(e.getMessage());
+        }
+    }
+
+
+    private Object receive() throws ConnectException{
+        try{
+                byte [] get = new byte[1024];
+                sc.read(ByteBuffer.wrap(get));
+                ByteArrayInputStream bis = new ByteArrayInputStream(get);
+                ObjectInputStream ois = new ObjectInputStream(bis);
+                return ois.readObject();
+
+        } catch (IOException|ClassNotFoundException e){
+            //System.err.println(e);
+            throw new ConnectException(e.getMessage());
+        }
+    }
+
+
     @Override
     public void run(){
         try{
@@ -51,43 +93,85 @@ public class Receiver extends Thread{
             ByteBuffer buff = null;
 
             while(sc.isOpen()){
+                Byte in = (Byte)receive();
 
-                // Receive
-                byte [] get = new byte[1024];
-                sc.read(ByteBuffer.wrap(get));
-                ByteArrayInputStream bis = new ByteArrayInputStream(get);
-                ObjectInputStream ois = new ObjectInputStream(bis);
-                Object obj = ois.readObject();
-                String str = (String)obj;
+                // If this set is different to the set from storage - change this one and send the differences
+                if(set == null){
+                    set = new HashSet<>();//System.out.println("set is null: 1");
+                }
 
-                String result = interpreter.getCommand(str);
 
-                System.out.println(sc.getRemoteAddress() + ":   " + str);
+                if(! set.equals(interpreter.getStorage().getSet()) ){
+                    HashSet<Human> setFromStorage = new HashSet<>();
+                    setFromStorage.addAll(interpreter.getStorage().getSet());
+                    HashSet<Human> tempToAdd = new HashSet<>();
+                    HashSet<Human> tempToRemove = new HashSet<>();
 
-                Thread.sleep(25);
+                    for(Human human : setFromStorage){
+                        if(!set.contains(human)){
+                            System.out.println("Will be added:  " + human);
+                            tempToAdd.add(human);
+                        }
+                    }
 
-                // Send
-                get = new byte[1024];
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                ObjectOutputStream oos=new ObjectOutputStream(bos);
-                String message = result;
-                oos.writeObject(message);
-                oos.flush();
+                    for(Human human : set){
+                        if(!setFromStorage.contains(human)){
+                            System.out.println("Will be removed:  " + human);
+                            tempToRemove.add(human);
+                        }
+                    }
 
-                byte[]serializedObject = bos.toByteArray();
-                sc.write(ByteBuffer.wrap(serializedObject));
+                    set = setFromStorage;
 
-                Thread.sleep(25);
+                    if(tempToAdd.size() > 0 || tempToRemove.size() > 0){
+
+                        for(Human human : tempToRemove){
+                            send(new Byte( (byte)2));
+                            //System.out.println("command 2 was sent");
+                            if(((Byte)receive()).byteValue() == 1){
+                                send(human);
+
+                                Thread.sleep(80);
+                                if(((Byte)receive()).byteValue() != 1){
+                                    return;
+                                }
+
+                                //System.out.println(human + " was sent");
+                            }
+                        }
+
+                        for(Human human : tempToAdd){
+                            send(new Byte( (byte)1));
+                            //System.out.println("command 1 was sent");
+                            if(((Byte)receive()).byteValue() == 1){
+                                send(human);
+
+                                Thread.sleep(80);
+                                if(((Byte)receive()).byteValue() != 1){
+                                    return;
+                                }
+
+                                //System.out.println(human + " was sent");
+                            }
+                        }
+
+                    } else {
+                        send( new Byte( (byte)0));
+                    }
+                } else {
+                    send( new Byte( (byte)0));
+                }
             }
 
-        } catch(IOException e){
+        } catch (IOException e){
             try{
                 System.err.println("Connection to " + sc.getRemoteAddress() + " was closed.");
+                //System.err.println(e.getMessage());
             } catch (IOException eee){}
             return;
         } catch (Exception e){
+            System.err.println("Unexpected problem was found in Reciever");
             System.err.println(e);
-            System.err.println(e.getMessage());
             return;
         }
     }

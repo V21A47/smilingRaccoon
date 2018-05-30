@@ -24,8 +24,12 @@ public class Sheduler{
         if(interpreter == null){
             System.err.println("ERRORRORO");
         }
-        startLogin();
-        loginFinished("testing");
+
+        userName = "User";
+
+        startServerWindow();
+        //startLogin();
+        //loginFinished("testing");
     }
 
     public void updateTree(){
@@ -45,12 +49,15 @@ public class Sheduler{
         loginWindow.setVisible(true);
     }
 
+    private void startServerWindow(){
+        serverWindow = new ServerWindow(this, interpreter, userName);
+        serverWindow.setVisible(true);
+    }
+
     public void loginFinished(String username){
         loginWindow.setVisible(false);
         loginWindow.dispose();
         loginWindow = null;
         this.userName = username;
-        serverWindow = new ServerWindow(this, interpreter, userName);
-        serverWindow.setVisible(true);
     }
 }

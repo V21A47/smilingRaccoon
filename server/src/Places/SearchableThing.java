@@ -1,10 +1,15 @@
 package Places;
+import java.io.Serializable;
 
-public abstract class SearchableThing{
+public abstract class SearchableThing implements Serializable{
     private double sizeValue;
     private String name;
     private int x;
     private int y;
+
+    public SearchableThing(){
+
+    }
 
     public SearchableThing(double sizeValue){
         if(sizeValue < 0.0D){

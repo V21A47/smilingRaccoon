@@ -1,19 +1,23 @@
 package AliveObjects;
 
+import java.io.Serializable;
 import Groups.IllegalGroupOperation;
 import Places.Searchable;
 import java.util.Comparator;
 
-public class Human extends AliveObject implements Speakable, Searchable, Comparable {
-    private HumanType type;
+public class Human extends AliveObject implements Speakable, Searchable, Comparable, Serializable {
+    private HumanType type = HumanType.NORMAL;
     public ConditionInCommunity condition;
-    private String gender;
+    private String gender = "male";
 
     public String getGender(){
         return gender;
     }
 
-    public static class ConditionInCommunity{
+    public Human(){
+        }
+
+    public static class ConditionInCommunity implements Serializable{
         private StateOfFreedom state;
         private int remainingTime;
 
