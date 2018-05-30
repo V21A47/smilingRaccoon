@@ -5,6 +5,7 @@ import javax.swing.tree.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.HashMap;
+import java.util.ArrayList;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.util.HashSet;
@@ -55,6 +56,8 @@ public class ClientWindow extends JFrame{
 
     private Executor executor;
 
+    private ArrayList<JPanel> humansPanels;
+
 
     public void updateSet(Human[] humans){
 
@@ -72,6 +75,8 @@ public class ClientWindow extends JFrame{
         set = new HashSet<Human>();
 
         { //initializing
+            humansPanels = new ArrayList<>();
+
             buttonStart = new JButton("Старт");
             buttonStart.setMaximumSize(new Dimension(80, 20));
             buttonStart.setMinimumSize(new Dimension(80, 20));
@@ -347,6 +352,10 @@ public class ClientWindow extends JFrame{
         pack();
         setBounds(250, 250, 1000, 550);
 
+
+    }
+
+    public void UpdateField(){
 
     }
 

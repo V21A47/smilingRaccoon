@@ -130,7 +130,8 @@ public class Human extends AliveObject implements Speakable, Searchable, Compara
         return object instanceof Human && ((Human) object).isAlive() == this.isAlive() &&
                 ((Human) object).getYearOfBirth() == this.getYearOfBirth() && ((Human) object).getName().equals(this.getName()) &&
                 ((Human) object).condition.getState() == condition.getState() && ((Human) object).type == type &&
-                ((Human) object).getX() == this.getX() && ((Human) object).getY() == this.getY();
+                ((Human) object).getX() == this.getX() && ((Human) object).getY() == this.getY() && ((Human) object).getGender().equals(this.getGender()) &&
+                ((Human) object).getSizeValue() == (this.getSizeValue());
     }
 
     @Override

@@ -21,6 +21,11 @@ public class Executor extends Thread{
 
     private HashSet<Human> set;
 
+
+    public HashSet getSet(){
+        return set;
+    }
+
     private Socket getSocket() {
         Socket newSocket = null;
         try{
@@ -101,7 +106,7 @@ public class Executor extends Thread{
 
     public void execute(String command, String operand){
         try{
-            send(new Byte( (byte)1 ));
+            send(new Byte( (byte)0 ));
 
             Byte answer = (Byte)receive();
 
@@ -111,7 +116,7 @@ public class Executor extends Thread{
                 switch(answer.byteValue()){
                     case 0:
                         //System.out.println("Got command: 0");
-                        return;
+                        break;
 
                     case 1:
                         // Add an object
@@ -119,9 +124,9 @@ public class Executor extends Thread{
                         send(new Byte( (byte)1));
                         Human human = (Human)receive();
                         send(new Byte( (byte)1));
-                        System.out.println("Command 1: " + human);
+                        System.out.println("add: " + human);
                         set.add(human);
-                        return;
+                        break;
 
                     case 2:
                         // Delete an object
@@ -129,10 +134,17 @@ public class Executor extends Thread{
                         send(new Byte( (byte)1));
                         human = (Human)receive();
                         send(new Byte( (byte)1));
-                        System.out.println("Command 2: " + human);
+                        System.out.println("remove: " + human);
                         set.remove(human);
-                        return;
+                        break;
                 }
+
+                if(answer != 0){
+                    for(Human human : set){
+                        System.out.println("\t" + human);
+                    }
+                }
+
             } else {
                 System.out.println("Got null!");
             }

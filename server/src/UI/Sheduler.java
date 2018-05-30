@@ -28,8 +28,6 @@ public class Sheduler{
         userName = "User";
 
         startServerWindow();
-        //startLogin();
-        //loginFinished("testing");
     }
 
     public void updateTree(){

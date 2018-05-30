@@ -93,7 +93,7 @@ public class Receiver extends Thread{
             ByteBuffer buff = null;
 
             while(sc.isOpen()){
-                Byte in = (Byte)receive();
+                //Byte in = (Byte)receive();
 
                 // If this set is different to the set from storage - change this one and send the differences
                 if(set == null){
@@ -126,12 +126,15 @@ public class Receiver extends Thread{
                     if(tempToAdd.size() > 0 || tempToRemove.size() > 0){
 
                         for(Human human : tempToRemove){
+                            byte answer = ((Byte)receive()).byteValue();
+
                             send(new Byte( (byte)2));
                             //System.out.println("command 2 was sent");
-                            if(((Byte)receive()).byteValue() == 1){
+                            answer = ((Byte)receive()).byteValue();
+                            if(answer == 1){
                                 send(human);
 
-                                Thread.sleep(80);
+                                //Thread.sleep(80);
                                 if(((Byte)receive()).byteValue() != 1){
                                     return;
                                 }
@@ -141,12 +144,15 @@ public class Receiver extends Thread{
                         }
 
                         for(Human human : tempToAdd){
+                            byte answer = ((Byte)receive()).byteValue();
+
                             send(new Byte( (byte)1));
                             //System.out.println("command 1 was sent");
-                            if(((Byte)receive()).byteValue() == 1){
+                            answer = ((Byte)receive()).byteValue();
+                            if(answer == 1){
                                 send(human);
 
-                                Thread.sleep(80);
+                                //Thread.sleep(80);
                                 if(((Byte)receive()).byteValue() != 1){
                                     return;
                                 }
@@ -156,9 +162,11 @@ public class Receiver extends Thread{
                         }
 
                     } else {
+                        byte answer = ((Byte)receive()).byteValue();
                         send( new Byte( (byte)0));
                     }
                 } else {
+                    byte answer = ((Byte)receive()).byteValue();
                     send( new Byte( (byte)0));
                 }
             }
@@ -166,7 +174,7 @@ public class Receiver extends Thread{
         } catch (IOException e){
             try{
                 System.err.println("Connection to " + sc.getRemoteAddress() + " was closed.");
-                //System.err.println(e.getMessage());
+                System.err.println(e.getMessage());
             } catch (IOException eee){}
             return;
         } catch (Exception e){
