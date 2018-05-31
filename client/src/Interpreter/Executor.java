@@ -124,7 +124,7 @@ public class Executor extends Thread{
                         send(new Byte( (byte)1));
                         Human human = (Human)receive();
                         send(new Byte( (byte)1));
-                        System.out.println("add: " + human);
+                        //System.out.println("add: " + human);
                         set.add(human);
                         break;
 
@@ -134,19 +134,19 @@ public class Executor extends Thread{
                         send(new Byte( (byte)1));
                         human = (Human)receive();
                         send(new Byte( (byte)1));
-                        System.out.println("remove: " + human);
+                        //System.out.println("remove: " + human);
                         set.remove(human);
                         break;
                 }
 
                 if(answer != 0){
                     for(Human human : set){
-                        System.out.println("\t" + human);
+                        //System.out.println("\t" + human);
                     }
                     if(sheduler.getClientWindow() != null){
                         sheduler.getClientWindow().update();
                     } else {
-                        System.err.println("Null in executor!");
+                        //System.err.println("Null in executor!");
                     }
                 }
 

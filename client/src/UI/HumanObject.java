@@ -21,7 +21,7 @@ public class HumanObject extends JPanel{
     private int x;
     private int y;
 
-    public BufferedImage image;
+    private BufferedImage image;
 
     public static int xPoint;
     public static int yPoint;
@@ -35,6 +35,9 @@ public class HumanObject extends JPanel{
     public static BufferedImage policeman;
     public static BufferedImage bandit;
     public static BufferedImage banditP;
+
+    private ActionManager actManager;
+
 
     static {
         try{
@@ -53,14 +56,13 @@ public class HumanObject extends JPanel{
         }
     }
 
-
-
-    public HumanObject(Human human){
+    public HumanObject(ActionManager actManager, Human human){
         super();
+        this.actManager = actManager;
         this.human = human;
         setBounds(xPoint + human.getX(), yPoint + human.getY(), 32, 32);
         setToolTipText(human.toString());
-
+        setBackground(Color.WHITE);
         if(human.getType() == HumanType.NORMAL){
             if(human.getGender().equals("female")){
                 image = HumanObject.girl;
@@ -84,12 +86,26 @@ public class HumanObject extends JPanel{
         }
     }
 
+    public Human getHuman(){
+        return human;
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
         g.drawImage(image, 0, 0, this);
-         // see javadoc for more info on the parameters
+
+        if(actManager != null){
+            System.out.println("BU!  " + actManager.getAlpha());
+
+            System.out.println(human + "   " + actManager.getAlpha());
+            g.setColor(new Color(255, 255, 255, actManager.getAlpha()));
+            g.fillRect(0, 0, 32, 32);
+        } else {
+            System.out.println("!");
+        }
+
     }
 
 }

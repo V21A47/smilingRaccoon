@@ -52,7 +52,7 @@ public class ClientWindow extends JFrame{
     private HashSet<HumanObject> humanPanelsSet;
 
     private Executor executor;
-
+    private ActionManager actManager;
 
 
 
@@ -64,12 +64,14 @@ public class ClientWindow extends JFrame{
     public void update(){
         HashSet<Human> set = executor.getSet();
 
+
         panel.removeAll();
 
         humanPanelsSet.clear();
 
         for(Human human : set){
-            HumanObject p = new HumanObject(human);
+            HumanObject p = new HumanObject(actManager, human);
+            humanPanelsSet.add(p);
             panel.add(p);
         }
         panel.repaint();
@@ -77,13 +79,27 @@ public class ClientWindow extends JFrame{
         //revalidate();
     }
 
+    public HashSet<HumanObject> getHumansInAct(){
+        HashSet<HumanObject> set = new HashSet<>();
 
+        for(HumanObject obj : humanPanelsSet){
+            if(obj.getHuman().getSizeValue()>50){
+                set.add(obj);
+            }
+        }
+
+        return set;
+    }
+
+    public HashSet<HumanObject> getSet(){
+        return humanPanelsSet;
+    }
 
     public ClientWindow(Executor executor){
         super("Client window");
         this.executor = executor;
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+        //update();
 
 
         { //initializing
@@ -213,6 +229,7 @@ public class ClientWindow extends JFrame{
         }
 
         panel.setLayout(null);
+        panel.setBackground(Color.WHITE);
         GroupLayout layout = new GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         {
@@ -351,6 +368,7 @@ public class ClientWindow extends JFrame{
 
         {
             buttonStart.addActionListener(new ButtonStartEventListener());
+            buttonStop.addActionListener(new ButtonStopEventListener());
 
             slider.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent e) {
@@ -365,17 +383,22 @@ public class ClientWindow extends JFrame{
         setBounds(100, 100, 1000, 800);
 
         update();
+        actManager = new ActionManager(this);
+        actManager.start();
     }
 
     class ButtonStartEventListener implements ActionListener{
-
         public void actionPerformed(ActionEvent e) {
-            changeTitle(" connected ");
-            try{
-                executor.getSheduler().command = "info";
-            } catch (Exception error){
-                changeTitle(" not connected ");
-            }
+            actManager.shouldWork = true;
+        }
+    }
+
+    class ButtonStopEventListener implements ActionListener{
+        public void actionPerformed(ActionEvent e) {
+            actManager.stopAct();
+            actManager.shouldWork = false;
+
+            update();
         }
     }
 }
