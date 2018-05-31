@@ -25,6 +25,7 @@ public class HumanObject extends JPanel{
 
     public static int xPoint;
     public static int yPoint;
+    public boolean shouldDisappear = false;
 
     private Human human;
 
@@ -37,6 +38,7 @@ public class HumanObject extends JPanel{
     public static BufferedImage banditP;
 
     private ActionManager actManager;
+
 
 
     static {
@@ -76,7 +78,9 @@ public class HumanObject extends JPanel{
                 }
             }
         } else if(human.getType() == HumanType.POLICE){
-            image = HumanObject.policeman;
+
+
+  image = HumanObject.policeman;
         } else {
             if(human.getConditionInCommunity().getState() == StateOfFreedom.FREE){
                 image = HumanObject.bandit;
@@ -84,6 +88,14 @@ public class HumanObject extends JPanel{
                 image = HumanObject.banditP;
             }
         }
+    }
+
+    public boolean shouldDisappear(){
+        return this.shouldDisappear;
+    }
+
+    public void shouldDisappear(boolean v){
+        this.shouldDisappear = v;
     }
 
     public Human getHuman(){
@@ -95,15 +107,15 @@ public class HumanObject extends JPanel{
         super.paintComponent(g);
 
         g.drawImage(image, 0, 0, this);
-
-        if(actManager != null){
-            System.out.println("BU!  " + actManager.getAlpha());
-
-            System.out.println(human + "   " + actManager.getAlpha());
-            g.setColor(new Color(255, 255, 255, actManager.getAlpha()));
+        if(actManager != null && actManager.window != null && actManager.window.getHumansInAct().contains(this)){
+            int al = actManager.getAlpha();
+            if(al < 0 || al > 255){
+                al = 0;
+            }
+            g.setColor(new Color(255, 255, 255, al));
             g.fillRect(0, 0, 32, 32);
         } else {
-            System.out.println("!");
+            //System.out.println("    !");
         }
 
     }

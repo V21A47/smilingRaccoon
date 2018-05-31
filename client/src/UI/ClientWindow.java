@@ -64,7 +64,6 @@ public class ClientWindow extends JFrame{
     public void update(){
         HashSet<Human> set = executor.getSet();
 
-
         panel.removeAll();
 
         humanPanelsSet.clear();
@@ -81,13 +80,104 @@ public class ClientWindow extends JFrame{
 
     public HashSet<HumanObject> getHumansInAct(){
         HashSet<HumanObject> set = new HashSet<>();
+        set.clear();
 
-        for(HumanObject obj : humanPanelsSet){
-            if(obj.getHuman().getSizeValue()>50){
-                set.add(obj);
-            }
+        String name = textFieldName.getText().trim();
+
+        labelInfo.setText("");
+
+        int year = 0;
+        try{
+            year = Integer.parseInt(textFieldYear.getText());
+        } catch (NumberFormatException error){
+            labelInfo.setText("год рождения: [0:2018]");
+            return set;
         }
 
+        if(year < 0 || year > 2018){
+            return set;
+        }
+
+        int x = 0;
+        try{
+            x = Integer.parseInt(textFieldX.getText());
+            if(x < SearchableThing.minX || x > SearchableThing.maxX){
+                labelInfo.setText("x может быть [" + SearchableThing.minX + ", " + SearchableThing.maxX + "]");
+                return set;
+            }
+        } catch (NumberFormatException error){
+            labelInfo.setText("x может быть [" + SearchableThing.minX + ", " + SearchableThing.maxX + "]");
+            return set;
+        }
+
+        int y = 0;
+        try{
+            y = Integer.parseInt(textFieldY.getText());
+            if(y < SearchableThing.minY || y > SearchableThing.maxY){
+                labelInfo.setText("y может быть [" + SearchableThing.minY + ", " + SearchableThing.maxY + "]");
+                return set;
+            }
+        } catch (NumberFormatException error){
+            labelInfo.setText("y может быть [" + SearchableThing.minY + ", " + SearchableThing.maxY + "]");
+            return set;
+        }
+
+        if((checkNormal.isSelected() || checkIsAlive.isSelected() || checkMale.isSelected() || checkFemale.isSelected() ||
+            checkPolice.isSelected() || checkBandit.isSelected() || checkArrested.isSelected() || checkImprisoned.isSelected() ||
+            checkFree.isSelected()) == false){
+
+            return set;
+        }
+
+        String xOp = textFieldXop.getSelectedItem().toString();
+        String yOp = textFieldYop.getSelectedItem().toString();
+
+        int mass = slider.getValue();
+
+        for(HumanObject obj : humanPanelsSet){
+
+
+            //System.out.println(obj.getHuman().getX());
+            boolean exp = (obj.getHuman().getSizeValue() <= mass &&  // mass
+                ( (year == 0 || obj.getHuman().getYearOfBirth() == year))  &&    //name
+                ( (name.equals("") || obj.getHuman().getName().equals(name)) ) &&  // year of birth
+                (
+                    ( xOp.equals("=") && ( x == obj.getHuman().getX()) ) ||
+                    ( xOp.equals("<") && ( obj.getHuman().getX() < x ) ||
+                    ( xOp.equals(">") && ( obj.getHuman().getX() > x) )
+                ) && // x
+                (
+                    ( yOp.equals("=") && ( y == obj.getHuman().getY()) ) ||
+                    ( yOp.equals("<") && ( y > obj.getHuman().getY()) ) ||
+                    ( yOp.equals(">") && ( y < obj.getHuman().getY()) )
+                ) && // y
+                (
+                    ( checkIsAlive.isSelected() == obj.getHuman().isAlive() ) &&
+                    (
+                        checkMale.isSelected() && obj.getHuman().getGender().equals("male")    ||
+                        checkFemale.isSelected() && obj.getHuman().getGender().equals("female")
+                    ) &&
+                    (
+                        checkNormal.isSelected() && obj.getHuman().getType() == HumanType.NORMAL ||
+                        checkPolice.isSelected() && obj.getHuman().getType() == HumanType.POLICE ||
+                        checkBandit.isSelected() && obj.getHuman().getType() == HumanType.BANDIT
+                    ) &&
+                    (
+                        checkArrested.isSelected() && obj.getHuman().getConditionInCommunity().getState() == StateOfFreedom.ARRESTED ||
+                        checkImprisoned.isSelected() && obj.getHuman().getConditionInCommunity().getState() == StateOfFreedom.IMPRISONED ||
+                        checkFree.isSelected() && obj.getHuman().getConditionInCommunity().getState() == StateOfFreedom.FREE
+                    )
+                )
+                ));
+                //System.out.println(obj.getHuman() + "   " + exp);
+            if(exp){
+                obj.shouldDisappear(true);
+                set.add(obj);
+            }
+
+        }
+
+        System.out.println(set.size());
         return set;
     }
 

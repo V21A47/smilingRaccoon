@@ -136,6 +136,6 @@ public class Human extends AliveObject implements Speakable, Searchable, Compara
 
     @Override
     public String toString(){
-        return this.type + " " + this.getName();
+        return this.type + " " + this.getName() + "\r\n x: " + getX() + " y: " + getY();
     }
 }
