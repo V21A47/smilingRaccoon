@@ -1,22 +1,18 @@
 package UI;
 
 import javax.swing.*;
-import javax.swing.tree.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.HashMap;
-import java.util.ArrayList;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.util.HashSet;
 
 import AliveObjects.*;
 import Interpreter.*;
+import Places.*;
 
 public class ClientWindow extends JFrame{
-
-    private HashSet<Human> set;
-
     private JButton buttonStart = null;
     private JButton buttonStop = null;
 
@@ -53,29 +49,45 @@ public class ClientWindow extends JFrame{
     private JCheckBox checkFree;
 
     private JPanel panel;
+    private HashSet<HumanObject> humanPanelsSet;
 
     private Executor executor;
 
-    private ArrayList<JPanel> humansPanels;
 
 
-    public void updateSet(Human[] humans){
-
-    }
 
     public void changeTitle(String text){
         setTitle("Client window: " + text);
     }
+
+
+    public void update(){
+        HashSet<Human> set = executor.getSet();
+
+        panel.removeAll();
+
+        humanPanelsSet.clear();
+
+        for(Human human : set){
+            HumanObject p = new HumanObject(human);
+            panel.add(p);
+        }
+        panel.repaint();
+        panel.revalidate();
+        //revalidate();
+    }
+
+
 
     public ClientWindow(Executor executor){
         super("Client window");
         this.executor = executor;
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        set = new HashSet<Human>();
+
 
         { //initializing
-            humansPanels = new ArrayList<>();
+            humanPanelsSet = new HashSet();
 
             buttonStart = new JButton("Старт");
             buttonStart.setMaximumSize(new Dimension(80, 20));
@@ -195,11 +207,12 @@ public class ClientWindow extends JFrame{
             checkFree.setMinimumSize(new Dimension(150, 20));
 
             panel = new JPanel();
-            panel.setBackground(Color.lightGray);
+            //panel.setBackground(Color.lightGray);
             panel.setMaximumSize(new Dimension(1900, 1200));
             panel.setMinimumSize(new Dimension(600, 600));
         }
 
+        panel.setLayout(null);
         GroupLayout layout = new GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         {
@@ -339,7 +352,6 @@ public class ClientWindow extends JFrame{
         {
             buttonStart.addActionListener(new ButtonStartEventListener());
 
-
             slider.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent e) {
                     // меняем надпись
@@ -350,13 +362,9 @@ public class ClientWindow extends JFrame{
 
         }
         pack();
-        setBounds(250, 250, 1000, 550);
+        setBounds(100, 100, 1000, 800);
 
-
-    }
-
-    public void UpdateField(){
-
+        update();
     }
 
     class ButtonStartEventListener implements ActionListener{

@@ -7,6 +7,11 @@ public abstract class SearchableThing implements Serializable{
     private int x;
     private int y;
 
+    public static int maxX = 350;
+    public static int minX = -350;
+    public static int maxY = 300;
+    public static int minY = -300;
+
     public SearchableThing(){
 
     }
@@ -21,8 +26,9 @@ public abstract class SearchableThing implements Serializable{
 
     public SearchableThing(double sizeValue, String name, int x, int y){
         this(sizeValue, name);
-        this.x = x;
-        this.y = y;
+        if(! move(x, y)){
+            move(SearchableThing.minX, SearchableThing.minY);
+        }
     }
 
     public SearchableThing(double sizeValue, String name){
@@ -43,6 +49,14 @@ public abstract class SearchableThing implements Serializable{
     }
 
     public boolean move(int x, int y){
+        if(x < SearchableThing.minX || x > SearchableThing.maxX){
+            return false;
+        }
+
+        if(y < SearchableThing.minY || y > SearchableThing.maxY){
+            return false;
+        }
+
         this.x = x;
         this.y = y;
         return true;

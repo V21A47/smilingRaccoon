@@ -143,6 +143,11 @@ public class Executor extends Thread{
                     for(Human human : set){
                         System.out.println("\t" + human);
                     }
+                    if(sheduler.getClientWindow() != null){
+                        sheduler.getClientWindow().update();
+                    } else {
+                        System.err.println("Null in executor!");
+                    }
                 }
 
             } else {

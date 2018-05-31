@@ -5,6 +5,8 @@ import java.awt.*;
 import java.awt.event.*;
 
 import AliveObjects.*;
+import Places.*;
+
 
 class ChangeObjectWindow extends JFrame{
     private JLabel labelTask;
@@ -389,23 +391,23 @@ class ChangeObjectWindow extends JFrame{
 
             try{
                 int x = Integer.parseInt(textFieldX.getText());
-                if(x < -1000 || x > 1000){
-                    labelInf.setText("Укажите корректную X координату( [-1000, 1000] )");
+                if(x < SearchableThing.minX || x > SearchableThing.maxX){
+                    labelInf.setText("Укажите корректную X координату( [" + SearchableThing.minX + ", " + SearchableThing.maxX + "] )");
                     return;
                 }
             } catch (NumberFormatException error){
-                labelInf.setText("Укажите корректную X координату( [-1000, 1000] )");
+                labelInf.setText("Укажите корректную X координату( [" + SearchableThing.minX + ", " + SearchableThing.maxX + "] )");
                 return;
             }
 
             try{
                 int y = Integer.parseInt(textFieldY.getText());
-                if(y < -1000 || y > 1000){
-                    labelInf.setText("Укажите корректную Y координату( [-1000, 1000] )");
+                if(y < SearchableThing.minY || y > SearchableThing.maxY){
+                    labelInf.setText("Укажите корректную Y координату( [" + SearchableThing.minY + ", " + SearchableThing.maxY + "] )");
                     return;
                 }
             } catch (NumberFormatException error){
-                labelInf.setText("Укажите корректную Y координату( [-1000, 1000] )");
+                labelInf.setText("Укажите корректную Y координату( [" + SearchableThing.minY + ", " + SearchableThing.maxY + "] )");
                 return;
             }
 
