@@ -299,6 +299,28 @@ class AddObjectWindow extends JFrame{
             );
         }
 
+        String [] maleNames = {"John", "Bob", "Carl", "Bobby", "Ivan", "Arthur", "Philip"};
+        String [] femaleNames = {"Sarah", "Juddy", "Emma", "Isabella", "Sophia"};
+
+        if(Math.random() < 0.5D){
+            radioGenderMale.setSelected(true);
+        } else {
+            radioGenderFemale.setSelected(true);
+        }
+
+        textFieldX.setText("" + (int)((Math.random() >0.5D ? 1 : -1)*(Human.maxX)*Math.random()) );
+        textFieldY.setText("" + (int)((Math.random() >0.5D ? 1 : -1)*(Human.maxY)*Math.random()) );
+        textFieldYearOfBirth.setText( "" + ( 1940 + (int)(Math.random()*78)));
+        textFieldTime.setText("0");
+        checkIsAlive.setSelected(true);
+
+        if(radioGenderMale.isSelected()){
+            textFieldName.setText(maleNames[ (int)(Math.random()*7) ]);
+            textFieldMass.setText("" + (int)( 50 + Math.random() * 70) );
+        } else {
+            textFieldName.setText(femaleNames[ (int)(Math.random()*5) ]);
+            textFieldMass.setText("" +  (int)( 50 + Math.random() * 40) );
+        }
 
 
         pack();
