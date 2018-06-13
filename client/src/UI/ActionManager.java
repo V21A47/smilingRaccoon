@@ -41,7 +41,6 @@ public class ActionManager extends Thread{
             while(true){
                 if(shouldWork){
                     if(window.getHumansInAct() != null){
-                        //System.out.println( window.getHumansInAct().size());
 
                         if(alpha < 240 && !flag){
                             this.alpha += mAlpha;

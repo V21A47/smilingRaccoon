@@ -80,7 +80,6 @@ public class Receiver extends Thread{
                 return ois.readObject();
 
         } catch (IOException|ClassNotFoundException e){
-            //System.err.println(e);
             throw new ConnectException(e.getMessage());
         }
     }
@@ -109,14 +108,14 @@ public class Receiver extends Thread{
 
                     for(Human human : setFromStorage){
                         if(!set.contains(human)){
-                            System.out.println("Will be added:  " + human);
+                            //System.out.println("Will be added:  " + human);
                             tempToAdd.add(human);
                         }
                     }
 
                     for(Human human : set){
                         if(!setFromStorage.contains(human)){
-                            System.out.println("Will be removed:  " + human);
+                            //System.out.println("Will be removed:  " + human);
                             tempToRemove.add(human);
                         }
                     }
@@ -129,17 +128,13 @@ public class Receiver extends Thread{
                             byte answer = ((Byte)receive()).byteValue();
 
                             send(new Byte( (byte)2));
-                            //System.out.println("command 2 was sent");
                             answer = ((Byte)receive()).byteValue();
                             if(answer == 1){
                                 send(human);
 
-                                //Thread.sleep(80);
                                 if(((Byte)receive()).byteValue() != 1){
                                     return;
                                 }
-
-                                //System.out.println(human + " was sent");
                             }
                         }
 
@@ -147,17 +142,14 @@ public class Receiver extends Thread{
                             byte answer = ((Byte)receive()).byteValue();
 
                             send(new Byte( (byte)1));
-                            //System.out.println("command 1 was sent");
                             answer = ((Byte)receive()).byteValue();
                             if(answer == 1){
                                 send(human);
 
-                                //Thread.sleep(80);
                                 if(((Byte)receive()).byteValue() != 1){
                                     return;
                                 }
 
-                                //System.out.println(human + " was sent");
                             }
                         }
 

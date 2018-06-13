@@ -4,11 +4,14 @@ import java.io.Serializable;
 import Groups.IllegalGroupOperation;
 import Places.Searchable;
 import java.util.Comparator;
+import java.time.LocalDateTime;
+
 
 public class Human extends AliveObject implements Speakable, Searchable, Comparable, Serializable {
     private HumanType type = HumanType.NORMAL;
     public ConditionInCommunity condition;
     private String gender = "male";
+    private String time;
 
     public String getGender(){
         return gender;
@@ -16,6 +19,10 @@ public class Human extends AliveObject implements Speakable, Searchable, Compara
 
     public Human(){
         }
+
+    public String getTime(){
+        return time;
+    }
 
     public static class ConditionInCommunity implements Serializable{
         private StateOfFreedom state;
@@ -55,12 +62,16 @@ public class Human extends AliveObject implements Speakable, Searchable, Compara
 
     public Human(String name, int yearOfBirth, HumanType type, int x, int y){
         super(name, yearOfBirth, 80.0D, x, y);
+        time = LocalDateTime.now().toString();
+        System.out.println(time);
         this.type = type;
         condition = new ConditionInCommunity(StateOfFreedom.FREE, -1);
     }
 
     public Human(String name, int yearOfBirth, HumanType type){
         super(name, yearOfBirth, 80.0D);
+        time = LocalDateTime.now().toString();
+        System.out.println(time);
         this.type = type;
         condition = new ConditionInCommunity(StateOfFreedom.FREE, -1);
     }
@@ -131,11 +142,12 @@ public class Human extends AliveObject implements Speakable, Searchable, Compara
                 ((Human) object).getYearOfBirth() == this.getYearOfBirth() && ((Human) object).getName().equals(this.getName()) &&
                 ((Human) object).condition.getState() == condition.getState() && ((Human) object).type == type &&
                 ((Human) object).getX() == this.getX() && ((Human) object).getY() == this.getY() && ((Human) object).getGender().equals(this.getGender()) &&
-                ((Human) object).getSizeValue() == (this.getSizeValue());
+                ((Human) object).getSizeValue() == (this.getSizeValue()) &&
+                ((Human) object).getTime().equals(this.time);
     }
 
     @Override
     public String toString(){
-        return this.type + " " + this.getName() + "\r\n x: " + getX() + " y: " + getY();
+        return this.type + " " + this.getName() + "\r\n x: " + getX() + " y: " + getY() + time;
     }
 }

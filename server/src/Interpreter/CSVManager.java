@@ -56,6 +56,9 @@ public class CSVManager {
         text.append(human.getGender());
         text.append(",");
 
+        text.append(human.getTime());
+        text.append(",");
+
         text.append(human.getName());
 
         text.append(System.lineSeparator());
@@ -103,7 +106,7 @@ public class CSVManager {
             } else if (symbol == System.lineSeparator().charAt(0)){
                 listOfValues.add(tempString.toString());
                 //
-                if(listOfValues.size() != 10){
+                if(listOfValues.size() != 11){
                     System.err.println("Incorrect file data");
                     return null;
                 }
@@ -127,7 +130,8 @@ public class CSVManager {
                             "\"yearOfBirth\":" + listOfValues.get(6) + "," +
                             "\"sizeValue\":" + listOfValues.get(7) + "," +
                             "\"gender\":\"" + listOfValues.get(8) + "\"," +
-                            "\"name\":\"" + listOfValues.get(9) + "\"" +
+                            "\"time\":\"" + listOfValues.get(9) + "\"," +
+                            "\"name\":\"" + listOfValues.get(10) + "\"" +
                             "}";
 
                 }catch (IndexOutOfBoundsException ex) {

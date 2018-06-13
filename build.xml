@@ -7,6 +7,13 @@
     </path>
 
 
+    <target name="c" depends="clean.client,stuff.jar.client">
+        <java jar="client.jar" fork="true" />
+    </target>
+
+    <target name="s" depends="clean.server,stuff.jar.server">
+        <java jar="server.jar" fork="true" />
+    </target>
 
     <target name="build.server18" description="build the server part of the program">
         <mkdir dir="server/build"/>
@@ -79,23 +86,11 @@
             <fileset dir="client/build">
                 <include name="**/*.class"/>
             </fileset>
+            <fileset dir="resources">
+                <include name="**/*"/>
+            </fileset>
         </jar>
     </target>
-
-
-
-
-    <target name="run.client" description="run client part" depends="stuff.jar.client">
-        <java jar="client.jar" fork="true"/>
-    </target>
-
-
-
-    <target name="run.server" description="run server part" depends="stuff.jar.server">
-        <java jar="server.jar" fork="true"/>
-    </target>
-
-
 
 
     <target name="stuff.jar.server" description="create a jar file for server part" depends="build.server">

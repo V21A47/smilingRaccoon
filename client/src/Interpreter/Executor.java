@@ -63,7 +63,7 @@ public class Executor extends Thread{
             }
 
             if(sheduler.getClientWindow() != null){
-                sheduler.getClientWindow().changeTitle(" connected");
+                sheduler.getClientWindow().changeTitle(true);
             }
 
             execute(null, null);
@@ -110,43 +110,35 @@ public class Executor extends Thread{
 
             Byte answer = (Byte)receive();
 
-            //System.out.println("answer: " + answer.byteValue());
 
             if(answer != null){
                 switch(answer.byteValue()){
                     case 0:
-                        //System.out.println("Got command: 0");
                         break;
 
                     case 1:
                         // Add an object
-                        //System.out.println("Got command: 1");
                         send(new Byte( (byte)1));
                         Human human = (Human)receive();
                         send(new Byte( (byte)1));
-                        //System.out.println("add: " + human);
                         set.add(human);
                         break;
 
                     case 2:
                         // Delete an object
-                        //System.out.println("Got command: 2");
                         send(new Byte( (byte)1));
                         human = (Human)receive();
                         send(new Byte( (byte)1));
-                        //System.out.println("remove: " + human);
                         set.remove(human);
                         break;
                 }
 
                 if(answer != 0){
                     for(Human human : set){
-                        //System.out.println("\t" + human);
                     }
                     if(sheduler.getClientWindow() != null){
                         sheduler.getClientWindow().update();
                     } else {
-                        //System.err.println("Null in executor!");
                     }
                 }
 
@@ -157,7 +149,7 @@ public class Executor extends Thread{
         } catch (IOException er){
             if(sheduler.getClientWindow() != null &&
                         sheduler.getClientWindow().getTitle().equals(" is not connected now!") == false){
-                sheduler.getClientWindow().changeTitle(" is not connected now!");
+                sheduler.getClientWindow().changeTitle(false);
             }
             socket = null;
 

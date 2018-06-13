@@ -7,6 +7,8 @@ import java.awt.event.*;
 import AliveObjects.*;
 import Places.*;
 
+import java.time.LocalDateTime;
+
 class AddObjectWindow extends JFrame{
     private JLabel labelTask;
     private JLabel labelName;
@@ -423,6 +425,7 @@ class AddObjectWindow extends JFrame{
                             "\"yearOfBirth\":" + Integer.parseInt(textFieldYearOfBirth.getText()) + "," +
                             "\"sizeValue\":" + Double.parseDouble(textFieldMass.getText()) + "," +
                             "\"gender\":\"" + gender + "\"," +
+                            "\"time\":\"" + LocalDateTime.now().toString()  + "\"," +
                             "\"name\":\"" + textFieldName.getText() + "\"" +
                             "}";
             if(serverWindow.getInterpreter().getCommand("add " + operand).indexOf("can't be") > 0){

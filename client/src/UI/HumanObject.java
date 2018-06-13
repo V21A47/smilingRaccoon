@@ -15,6 +15,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
+import java.util.ResourceBundle;
+import java.util.Locale;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
+import java.time.format.FormatStyle;
+
 public class HumanObject extends JPanel{
 
     private String caption;
@@ -39,8 +45,6 @@ public class HumanObject extends JPanel{
 
     private ActionManager actManager;
 
-
-
     static {
         try{
             man1 = ImageIO.read(new File("resources/man1.png"));
@@ -54,16 +58,48 @@ public class HumanObject extends JPanel{
             xPoint = (int)((Math.abs(SearchableThing.maxX) + Math.abs(SearchableThing.minX)) / 2) + 30;
             yPoint = (int)((Math.abs(SearchableThing.maxY) + Math.abs(SearchableThing.minY)) / 2) + 30;
         } catch (IOException e){
-            System.err.println(e);
+            System.err.println("\t" + e);
         }
     }
 
-    public HumanObject(ActionManager actManager, Human human){
+    public void setToolTip(ResourceBundle bundle){
+        String toolTip = "<html>";
+
+        if(human.getType() == HumanType.NORMAL){
+            toolTip =  "<html>" + bundle.getString("normalTypeLabel");
+        } else if (human.getType() == HumanType.POLICE){
+            toolTip =  "<html>" + bundle.getString("policeTypeLabel");
+        } else {
+            toolTip =  "<html>" + bundle.getString("banditTypeLabel");
+        }
+
+        toolTip = toolTip + " " + human.getName();
+
+
+        LocalDateTime ldt = LocalDateTime.parse(human.getTime());
+
+        System.out.println(bundle.getLocale().getDisplayName());
+        DateTimeFormatter formatter = null;
+
+        try{
+            formatter= DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withLocale(actManager.window.locale);
+        } catch (NullPointerException e){
+            formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
+        }
+
+        toolTip = toolTip + "<br>x: " + human.getX() + " y: " + human.getY() + "<br>" + formatter.format(ldt) + "</html>";
+        setToolTipText(toolTip);
+    }
+
+    public HumanObject(ActionManager actManager, Human human, ResourceBundle bundle){
         super();
         this.actManager = actManager;
         this.human = human;
+
         setBounds(xPoint + human.getX(), yPoint + human.getY(), 32, 32);
-        setToolTipText(human.toString());
+
+        setToolTip(bundle);
+
         setBackground(Color.WHITE);
         if(human.getType() == HumanType.NORMAL){
             if(human.getGender().equals("female")){

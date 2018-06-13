@@ -8,11 +8,17 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.util.HashSet;
 
+import java.util.ResourceBundle;
+import java.util.Locale;
+
 import AliveObjects.*;
 import Interpreter.*;
 import Places.*;
 
 public class ClientWindow extends JFrame{
+    private ResourceBundle bundle = null;
+    public Locale locale = null;
+
     private JButton buttonStart = null;
     private JButton buttonStop = null;
 
@@ -48,6 +54,13 @@ public class ClientWindow extends JFrame{
     private JCheckBox checkImprisoned;
     private JCheckBox checkFree;
 
+    private JMenuBar menuBar = null;
+    private JMenu menu = null;
+    private JMenuItem menuRussian = null;
+    private JMenuItem menuIcelandic = null;
+    private JMenuItem menuBulgarian = null;
+    private JMenuItem menuEnglish = null;
+
     private JPanel panel;
     private HashSet<HumanObject> humanPanelsSet;
 
@@ -56,8 +69,12 @@ public class ClientWindow extends JFrame{
 
 
 
-    public void changeTitle(String text){
-        setTitle("Client window: " + text);
+    public void changeTitle(boolean v){
+        if(v){
+            setTitle(bundle.getString("windowTitle") + bundle.getString("Connection"));
+        } else {
+            setTitle(bundle.getString("windowTitle"));
+        }
     }
 
 
@@ -69,13 +86,12 @@ public class ClientWindow extends JFrame{
         humanPanelsSet.clear();
 
         for(Human human : set){
-            HumanObject p = new HumanObject(actManager, human);
+            HumanObject p = new HumanObject(actManager, human, bundle);
             humanPanelsSet.add(p);
             panel.add(p);
         }
         panel.repaint();
         panel.revalidate();
-        //revalidate();
     }
 
     public HashSet<HumanObject> getHumansInAct(){
@@ -86,46 +102,53 @@ public class ClientWindow extends JFrame{
 
         labelInfo.setText("");
 
-        int year = 0;
+        Integer year = 0;
         try{
-            year = Integer.parseInt(textFieldYear.getText());
+            if(textFieldYear.getText().isEmpty()){
+                year = null;
+            } else {
+                year = Integer.parseInt(textFieldYear.getText());
+            }
         } catch (NumberFormatException error){
-            labelInfo.setText("год рождения: [0:2018]");
+            labelInfo.setText( bundle.getString("yearOfBirth") + ": [0:2018]" );
             return set;
         }
 
-        if(year < 0 || year > 2018){
+        if(year != null && (year < 0 || year > 2018) ){
             return set;
         }
 
-        int x = 0;
+        Integer x = 0;
         try{
-            x = Integer.parseInt(textFieldX.getText());
-            if(x < SearchableThing.minX || x > SearchableThing.maxX){
-                labelInfo.setText("x может быть [" + SearchableThing.minX + ", " + SearchableThing.maxX + "]");
+            if(textFieldX.getText().isEmpty()){
+                x = null;
+            } else {
+                x = Integer.parseInt(textFieldX.getText());
+            }
+
+            if(x != null && (x < SearchableThing.minX || x > SearchableThing.maxX)){
+                labelInfo.setText(bundle.getString("possibleXValues") + " [" + SearchableThing.minX + ", " + SearchableThing.maxX + "]");
                 return set;
             }
         } catch (NumberFormatException error){
-            labelInfo.setText("x может быть [" + SearchableThing.minX + ", " + SearchableThing.maxX + "]");
+            labelInfo.setText(bundle.getString("possibleXValues") + " [" + SearchableThing.minX + ", " + SearchableThing.maxX + "]");
             return set;
         }
 
-        int y = 0;
+        Integer y = 0;
         try{
-            y = Integer.parseInt(textFieldY.getText());
-            if(y < SearchableThing.minY || y > SearchableThing.maxY){
-                labelInfo.setText("y может быть [" + SearchableThing.minY + ", " + SearchableThing.maxY + "]");
+            if(textFieldY.getText().isEmpty()){
+                y = null;
+            } else {
+                y = Integer.parseInt(textFieldY.getText());
+            }
+
+            if(y != null && (y < SearchableThing.minY || y > SearchableThing.maxY) ){
+                labelInfo.setText(bundle.getString("possibleYValues") + " [" + SearchableThing.minY + ", " + SearchableThing.maxY + "]");
                 return set;
             }
         } catch (NumberFormatException error){
-            labelInfo.setText("y может быть [" + SearchableThing.minY + ", " + SearchableThing.maxY + "]");
-            return set;
-        }
-
-        if((checkNormal.isSelected() || checkIsAlive.isSelected() || checkMale.isSelected() || checkFemale.isSelected() ||
-            checkPolice.isSelected() || checkBandit.isSelected() || checkArrested.isSelected() || checkImprisoned.isSelected() ||
-            checkFree.isSelected()) == false){
-
+            labelInfo.setText(bundle.getString("possibleYValues") + " [" +  SearchableThing.minY + ", " + SearchableThing.maxY + "]");
             return set;
         }
 
@@ -135,49 +158,73 @@ public class ClientWindow extends JFrame{
         int mass = slider.getValue();
 
         for(HumanObject obj : humanPanelsSet){
+            Human human = obj.getHuman();
 
-
-            //System.out.println(obj.getHuman().getX());
-            boolean exp = (obj.getHuman().getSizeValue() <= mass &&  // mass
-                ( (year == 0 || obj.getHuman().getYearOfBirth() == year))  &&    //name
-                ( (name.equals("") || obj.getHuman().getName().equals(name)) ) &&  // year of birth
-                (
-                    ( xOp.equals("=") && ( x == obj.getHuman().getX()) ) ||
-                    ( xOp.equals("<") && ( obj.getHuman().getX() < x ) ||
-                    ( xOp.equals(">") && ( obj.getHuman().getX() > x) )
-                ) && // x
-                (
-                    ( yOp.equals("=") && ( y == obj.getHuman().getY()) ) ||
-                    ( yOp.equals("<") && ( y > obj.getHuman().getY()) ) ||
-                    ( yOp.equals(">") && ( y < obj.getHuman().getY()) )
-                ) && // y
-                (
-                    ( checkIsAlive.isSelected() == obj.getHuman().isAlive() ) &&
-                    (
-                        checkMale.isSelected() && obj.getHuman().getGender().equals("male")    ||
-                        checkFemale.isSelected() && obj.getHuman().getGender().equals("female")
-                    ) &&
-                    (
-                        checkNormal.isSelected() && obj.getHuman().getType() == HumanType.NORMAL ||
-                        checkPolice.isSelected() && obj.getHuman().getType() == HumanType.POLICE ||
-                        checkBandit.isSelected() && obj.getHuman().getType() == HumanType.BANDIT
-                    ) &&
-                    (
-                        checkArrested.isSelected() && obj.getHuman().getConditionInCommunity().getState() == StateOfFreedom.ARRESTED ||
-                        checkImprisoned.isSelected() && obj.getHuman().getConditionInCommunity().getState() == StateOfFreedom.IMPRISONED ||
-                        checkFree.isSelected() && obj.getHuman().getConditionInCommunity().getState() == StateOfFreedom.FREE
-                    )
-                )
-                ));
-                //System.out.println(obj.getHuman() + "   " + exp);
-            if(exp){
-                obj.shouldDisappear(true);
-                set.add(obj);
+            if( !name.equals("") && !name.equals(human.getName()) ){
+                continue;
             }
+
+            if( year != null && human.getYearOfBirth() != year ){
+                continue;
+            }
+
+            if( x != null ){
+                if( xOp.equals("=") && human.getX() != x ||
+                    xOp.equals("<") && human.getX() >= x ||
+                    xOp.equals(">") && human.getX() <= x){
+                    continue;
+                }
+            }
+
+            if( y != null ){
+                if( yOp.equals("=") && human.getX() != y ||
+                    yOp.equals("<") && human.getX() >= y ||
+                    yOp.equals(">") && human.getX() <= y){
+                    continue;
+                }
+            }
+
+            if( !(checkIsAlive.isSelected() && human.isAlive() || !checkIsAlive.isSelected() && !human.isAlive()) ){
+                continue;
+            }
+
+            if( ( checkMale.isSelected() || checkFemale.isSelected() ) ){
+                if( !(checkMale.isSelected() && checkMale.isSelected()) ){
+                    if((checkMale.isSelected() && !human.getGender().equals("male")) ||
+                        (checkFemale.isSelected() && !human.getGender().equals("female")) ){
+                        continue;
+                    }
+                }
+            }
+
+            if( ( checkNormal.isSelected() || checkPolice.isSelected() || checkBandit.isSelected()) ){
+                if( !(checkNormal.isSelected() && checkPolice.isSelected() && checkBandit.isSelected() ) ){
+                    if((checkNormal.isSelected() && human.getType() != HumanType.NORMAL) ||
+                        (checkPolice.isSelected() && human.getType() != HumanType.POLICE) ||
+                        (checkBandit.isSelected() && human.getType() != HumanType.BANDIT)){
+                        continue;
+                    }
+                }
+            }
+
+            if( ( checkArrested.isSelected() || checkImprisoned.isSelected() || checkFree.isSelected()) ){
+                if( !(checkArrested.isSelected() && checkImprisoned.isSelected() && checkFree.isSelected() ) ){
+                    if((checkArrested.isSelected() && human.getConditionInCommunity().getState() != StateOfFreedom.ARRESTED) ||
+                        (checkImprisoned.isSelected() && human.getConditionInCommunity().getState() != StateOfFreedom.IMPRISONED) ||
+                        (checkFree.isSelected() && human.getConditionInCommunity().getState() != StateOfFreedom.FREE)){
+                        continue;
+                    }
+                }
+            }
+
+            if( human.getSizeValue() > slider.getValue() ){
+                continue;
+            }
+            obj.shouldDisappear(true);
+            set.add(obj);
 
         }
 
-        System.out.println(set.size());
         return set;
     }
 
@@ -186,81 +233,109 @@ public class ClientWindow extends JFrame{
     }
 
     public ClientWindow(Executor executor){
-        super("Client window");
+        super();
+
+        try{
+            bundle = ResourceBundle.getBundle("langProperties/package_en_NZ");
+        } catch (Exception e){
+            System.err.println(e + "\nNo localization file data was found");
+            System.exit(1);
+        }
+        locale = new Locale("en", "NZ", "UNIX");
+
+        this.setTitle(bundle.getString("windowTitle"));
         this.executor = executor;
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //update();
+
+        {// MenuBar
+
+            menuBar = new JMenuBar();
+            menu = new JMenu(bundle.getString("menuName"));
+
+            menuRussian = new JMenuItem(bundle.getString("RussianLang"));
+            menuIcelandic = new JMenuItem(bundle.getString("IcelandicLang"));
+            menuBulgarian = new JMenuItem(bundle.getString("BulgarianLang"));
+            menuEnglish = new JMenuItem(bundle.getString("EnglishLang"));
+
+            menu.add(menuRussian);
+            menu.add(menuIcelandic);
+            menu.add(menuBulgarian);
+            menu.add(menuEnglish);
+
+            menuBar.add(menu);
+            this.setJMenuBar(menuBar);
+        }
 
 
         { //initializing
             humanPanelsSet = new HashSet();
 
-            buttonStart = new JButton("Старт");
-            buttonStart.setMaximumSize(new Dimension(80, 20));
-            buttonStart.setMinimumSize(new Dimension(80, 20));
+            buttonStart = new JButton(bundle.getString("startButtonLabel"));
+            buttonStart.setMaximumSize(new Dimension(120, 20));
+            buttonStart.setMinimumSize(new Dimension(120, 20));
 
-            buttonStop = new JButton("Стоп");
-            buttonStop.setMaximumSize(new Dimension(80, 20));
-            buttonStop.setMinimumSize(new Dimension(80, 20));
+            buttonStop = new JButton(bundle.getString("stopButtonLabel"));
+            buttonStop.setMaximumSize(new Dimension(120, 20));
+            buttonStop.setMinimumSize(new Dimension(120, 20));
 
             slider = new JSlider(0, 180, 180);
-            slider.setMaximumSize(new Dimension(200, 20));
-            slider.setMinimumSize(new Dimension(200, 20));
+            slider.setMaximumSize(new Dimension(260, 20));
+            slider.setMinimumSize(new Dimension(260, 20));
 
-            labelName = new JLabel("Имя");
-            labelName.setMaximumSize(new Dimension(50, 20));
-            labelName.setMinimumSize(new Dimension(50, 20));
+            labelName = new JLabel(bundle.getString("nameLabel"));
+            labelName.setMaximumSize(new Dimension(90, 20));
+            labelName.setMinimumSize(new Dimension(90, 20));
 
-            labelInfo = new JLabel("Подсказки");
+            labelInfo = new JLabel();
             labelInfo.setMaximumSize(new Dimension(200, 20));
             labelInfo.setMinimumSize(new Dimension(200, 20));
 
-            labelGender = new JLabel("Пол");
-            labelGender.setMaximumSize(new Dimension(50, 20));
-            labelGender.setMinimumSize(new Dimension(50, 20));
+            labelGender = new JLabel(bundle.getString("genderLabel"));
+            labelGender.setMaximumSize(new Dimension(90, 20));
+            labelGender.setMinimumSize(new Dimension(90, 20));
 
-            labelType = new JLabel("Тип");
-            labelType.setMaximumSize(new Dimension(50, 20));
-            labelType.setMinimumSize(new Dimension(50, 20));
+            labelType = new JLabel(bundle.getString("typeLabel"));
+            labelType.setMaximumSize(new Dimension(90, 20));
+            labelType.setMinimumSize(new Dimension(90, 20));
 
-            labelYear1 = new JLabel("Год");
-            labelYear1.setMaximumSize(new Dimension(50, 20));
-            labelYear1.setMinimumSize(new Dimension(50, 20));
-            labelYear2 = new JLabel("рожд.");
-            labelYear2.setMaximumSize(new Dimension(50, 20));
-            labelYear2.setMinimumSize(new Dimension(50, 20));
+            labelYear1 = new JLabel(bundle.getString("yearLabel1"));
+            labelYear1.setMaximumSize(new Dimension(90, 20));
+            labelYear1.setMinimumSize(new Dimension(90, 20));
+            labelYear2 = new JLabel(bundle.getString("yearLabel2"));
+            labelYear2.setMaximumSize(new Dimension(90, 20));
+            labelYear2.setMinimumSize(new Dimension(90, 20));
 
-            labelMass = new JLabel("Масса <=");
-            labelMass.setMaximumSize(new Dimension(70, 20));
-            labelMass.setMinimumSize(new Dimension(70, 20));
+            labelMass = new JLabel(bundle.getString("massLabel") + " <=");
+            labelMass.setMaximumSize(new Dimension(90, 20));
+            labelMass.setMinimumSize(new Dimension(90, 20));
 
             labelMass2 = new JLabel("180");
             labelMass2.setMaximumSize(new Dimension(50, 20));
             labelMass2.setMinimumSize(new Dimension(50, 20));
 
             labelX = new JLabel("Х");
-            labelX.setMaximumSize(new Dimension(50, 20));
-            labelX.setMinimumSize(new Dimension(50, 20));
+            labelX.setMaximumSize(new Dimension(90, 20));
+            labelX.setMinimumSize(new Dimension(90, 20));
 
             labelY = new JLabel("У");
-            labelY.setMaximumSize(new Dimension(50, 20));
-            labelY.setMinimumSize(new Dimension(50, 20));
+            labelY.setMaximumSize(new Dimension(90, 20));
+            labelY.setMinimumSize(new Dimension(90, 20));
 
-            labelCondition = new JLabel("Состояние");
-            labelCondition.setMaximumSize(new Dimension(80, 20));
-            labelCondition.setMinimumSize(new Dimension(80, 20));
+            labelCondition = new JLabel(bundle.getString("conditionLabel"));
+            labelCondition.setMaximumSize(new Dimension(100, 20));
+            labelCondition.setMinimumSize(new Dimension(100, 20));
 
             textFieldName = new JTextField();
-            textFieldName.setMaximumSize(new Dimension(150, 20));
-            textFieldName.setMinimumSize(new Dimension(150, 20));
+            textFieldName.setMaximumSize(new Dimension(170, 20));
+            textFieldName.setMinimumSize(new Dimension(170, 20));
 
             textFieldYear = new JTextField();
-            textFieldYear.setMaximumSize(new Dimension(150, 20));
-            textFieldYear.setMinimumSize(new Dimension(150, 20));
+            textFieldYear.setMaximumSize(new Dimension(170, 20));
+            textFieldYear.setMinimumSize(new Dimension(170, 20));
 
             textFieldX = new JTextField();
-            textFieldX.setMaximumSize(new Dimension(100, 20));
-            textFieldX.setMinimumSize(new Dimension(100, 20));
+            textFieldX.setMaximumSize(new Dimension(120, 20));
+            textFieldX.setMinimumSize(new Dimension(120, 20));
 
             String [] values = {"=", "<", ">"};
             textFieldXop = new JComboBox(values);
@@ -268,49 +343,48 @@ public class ClientWindow extends JFrame{
             textFieldXop.setMinimumSize(new Dimension(50, 20));
 
             textFieldY = new JTextField();
-            textFieldY.setMaximumSize(new Dimension(100, 20));
-            textFieldY.setMinimumSize(new Dimension(100, 20));
+            textFieldY.setMaximumSize(new Dimension(120, 20));
+            textFieldY.setMinimumSize(new Dimension(120, 20));
 
             textFieldYop = new JComboBox(values);
             textFieldYop.setMaximumSize(new Dimension(50, 20));
             textFieldYop.setMinimumSize(new Dimension(50, 20));
 
+            checkIsAlive = new JCheckBox(bundle.getString("isAliveLabel"));
+            checkIsAlive.setMaximumSize(new Dimension(170, 20));
+            checkIsAlive.setMinimumSize(new Dimension(170, 20));
 
-            checkIsAlive = new JCheckBox("Живой");
-            checkIsAlive.setMaximumSize(new Dimension(150, 20));
-            checkIsAlive.setMinimumSize(new Dimension(150, 20));
+            checkMale = new JCheckBox(bundle.getString("shortMaleLabel"));
+            checkMale.setMaximumSize(new Dimension(170, 20));
+            checkMale.setMinimumSize(new Dimension(170, 20));
 
-            checkMale = new JCheckBox("М");
-            checkMale.setMaximumSize(new Dimension(150, 20));
-            checkMale.setMinimumSize(new Dimension(150, 20));
+            checkFemale = new JCheckBox(bundle.getString("shortFemaleLabel"));
+            checkFemale.setMaximumSize(new Dimension(170, 20));
+            checkFemale.setMinimumSize(new Dimension(170, 20));
 
-            checkFemale = new JCheckBox("Ж");
-            checkFemale.setMaximumSize(new Dimension(150, 20));
-            checkFemale.setMinimumSize(new Dimension(150, 20));
+            checkNormal = new JCheckBox(bundle.getString("normalTypeLabel"));
+            checkNormal.setMaximumSize(new Dimension(170, 20));
+            checkNormal.setMinimumSize(new Dimension(170, 20));
 
-            checkNormal = new JCheckBox("Обычный житель");
-            checkNormal.setMaximumSize(new Dimension(150, 20));
-            checkNormal.setMinimumSize(new Dimension(150, 20));
+            checkPolice = new JCheckBox(bundle.getString("policeTypeLabel"));
+            checkPolice.setMaximumSize(new Dimension(170, 20));
+            checkPolice.setMinimumSize(new Dimension(170, 20));
 
-            checkPolice = new JCheckBox("Полицейский");
-            checkPolice.setMaximumSize(new Dimension(150, 20));
-            checkPolice.setMinimumSize(new Dimension(150, 20));
+            checkBandit = new JCheckBox(bundle.getString("banditTypeLabel"));
+            checkBandit.setMaximumSize(new Dimension(170, 20));
+            checkBandit.setMinimumSize(new Dimension(170, 20));
 
-            checkBandit = new JCheckBox("Бандит");
-            checkBandit.setMaximumSize(new Dimension(150, 20));
-            checkBandit.setMinimumSize(new Dimension(150, 20));
+            checkArrested = new JCheckBox(bundle.getString("arrestedCondLabel"));
+            checkArrested.setMaximumSize(new Dimension(170, 20));
+            checkArrested.setMinimumSize(new Dimension(170, 20));
 
-            checkArrested = new JCheckBox("Аррестован");
-            checkArrested.setMaximumSize(new Dimension(150, 20));
-            checkArrested.setMinimumSize(new Dimension(150, 20));
+            checkImprisoned = new JCheckBox(bundle.getString("imprisonedCondLabel"));
+            checkImprisoned.setMaximumSize(new Dimension(170, 20));
+            checkImprisoned.setMinimumSize(new Dimension(170, 20));
 
-            checkImprisoned = new JCheckBox("Заключен");
-            checkImprisoned.setMaximumSize(new Dimension(150, 20));
-            checkImprisoned.setMinimumSize(new Dimension(150, 20));
-
-            checkFree = new JCheckBox("Свободен");
-            checkFree.setMaximumSize(new Dimension(150, 20));
-            checkFree.setMinimumSize(new Dimension(150, 20));
+            checkFree = new JCheckBox(bundle.getString("freeCondLabel"));
+            checkFree.setMaximumSize(new Dimension(170, 20));
+            checkFree.setMinimumSize(new Dimension(170, 20));
 
             panel = new JPanel();
             //panel.setBackground(Color.lightGray);
@@ -468,13 +542,70 @@ public class ClientWindow extends JFrame{
                 }
             });
 
+            menuRussian.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    locale = new Locale("ru", "RU");
+                    changeBundle("package_ru_RU");
+                }
+            });
+            menuIcelandic.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    locale = new Locale("is", "IS");
+                    changeBundle("package_is_IS");
+                }
+            });
+            menuBulgarian.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    locale = new Locale("bg", "BG");
+                    changeBundle("package_bg_BG");
+                }
+            });
+            menuEnglish.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    locale = new Locale("en", "NZ", "UNIX");
+                    changeBundle("package_en_NZ");
+                }
+            });
         }
         pack();
         setBounds(100, 100, 1000, 800);
 
+
         update();
+
         actManager = new ActionManager(this);
         actManager.start();
+        changeBundle("package_en_NZ");
+    }
+
+    private void changeBundle(String newBundleFile){
+        try{
+            bundle = ResourceBundle.getBundle("langProperties/" + newBundleFile);
+            update();
+        } catch (Exception e){
+            System.err.println(e + "\nNo localization file data: " + newBundleFile + " was not found!");
+            return;
+        }
+
+        this.setTitle(bundle.getString("windowTitle"));
+        buttonStart.setText(bundle.getString("startButtonLabel"));
+        buttonStop.setText(bundle.getString("stopButtonLabel"));
+        labelName.setText(bundle.getString("nameLabel"));
+        labelGender.setText(bundle.getString("genderLabel"));
+        labelType.setText(bundle.getString("typeLabel"));
+        labelYear1.setText(bundle.getString("yearLabel1"));
+        labelYear2.setText(bundle.getString("yearLabel2"));
+        labelMass.setText(bundle.getString("massLabel") + " <=");
+        labelCondition.setText(bundle.getString("conditionLabel"));
+        checkIsAlive.setText(bundle.getString("isAliveLabel"));
+        checkMale.setText(bundle.getString("shortMaleLabel"));
+        checkFemale.setText(bundle.getString("shortFemaleLabel"));
+        checkNormal.setText(bundle.getString("normalTypeLabel"));
+        checkPolice.setText(bundle.getString("policeTypeLabel"));
+        checkBandit.setText(bundle.getString("banditTypeLabel"));
+        checkArrested.setText(bundle.getString("arrestedCondLabel"));
+        checkImprisoned.setText(bundle.getString("imprisonedCondLabel"));
+        checkFree.setText(bundle.getString("freeCondLabel"));
     }
 
     class ButtonStartEventListener implements ActionListener{
@@ -491,4 +622,6 @@ public class ClientWindow extends JFrame{
             update();
         }
     }
+
+
 }

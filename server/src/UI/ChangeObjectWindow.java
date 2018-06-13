@@ -6,7 +6,7 @@ import java.awt.event.*;
 
 import AliveObjects.*;
 import Places.*;
-
+import java.time.LocalDateTime;
 
 class ChangeObjectWindow extends JFrame{
     private JLabel labelTask;
@@ -477,7 +477,7 @@ class ChangeObjectWindow extends JFrame{
                 s = "false";
             }
 
-            String operand ="{" +
+            String operand = "{" +
                             "\"x\":" + Integer.parseInt(textFieldX.getText()) + "," +
                             "\"y\":" + Integer.parseInt(textFieldY.getText()) + "," +
                             "\"type\":\"" + type + "\"," +
@@ -488,6 +488,7 @@ class ChangeObjectWindow extends JFrame{
                             "\"yearOfBirth\":" + Integer.parseInt(textFieldYearOfBirth.getText()) + "," +
                             "\"sizeValue\":" + Double.parseDouble(textFieldMass.getText()) + "," +
                             "\"gender\":\"" + gender + "\"," +
+                            "\"time\":\"" + LocalDateTime.now().toString()  + "\"," +
                             "\"name\":\"" + textFieldName.getText() + "\"" +
                             "}";
 
