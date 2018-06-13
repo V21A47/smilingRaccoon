@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.util.HashMap;
 import java.io.IOException;
 import java.io.FileNotFoundException;
+import DB.*;
 
 public class LoginWindow extends JFrame{
     private JLabel labelUserName = null;
@@ -15,13 +16,14 @@ public class LoginWindow extends JFrame{
     private JTextField textFieldUserName = null;
     private JPasswordField textFieldPassword = null;
     private JButton buttonEnter = null;
+    private JButton buttonReg = null;
+    private JButton buttonChange = null;
     private String fileName;
     private Sheduler sheduler;
 
     public LoginWindow(Sheduler sheduler, String dataFile){
         super("LoginWindow");
 
-        //JFrame.setDefaultLookAndFeelDecorated(true);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         this.sheduler = sheduler;
@@ -38,8 +40,8 @@ public class LoginWindow extends JFrame{
             labelPassword.setMinimumSize(new Dimension(80, 20));
 
             labelErrorWhileEnter = new JLabel();
-            labelErrorWhileEnter.setMaximumSize(new Dimension(270, 20));
-            labelErrorWhileEnter.setMinimumSize(new Dimension(270, 20));
+            labelErrorWhileEnter.setMaximumSize(new Dimension(350, 20));
+            labelErrorWhileEnter.setMinimumSize(new Dimension(350, 20));
 
             textFieldUserName = new JTextField();
             textFieldUserName.setMaximumSize(new Dimension(120, 20));
@@ -52,6 +54,14 @@ public class LoginWindow extends JFrame{
             buttonEnter = new JButton("Enter");
             buttonEnter.setMaximumSize(new Dimension(80, 20));
             buttonEnter.setMinimumSize(new Dimension(80, 20));
+
+            buttonReg = new JButton("Registate");
+            buttonReg.setMaximumSize(new Dimension(120, 20));
+            buttonReg.setMinimumSize(new Dimension(120, 20));
+
+            buttonChange = new JButton("Change password");
+            buttonChange.setMaximumSize(new Dimension(160, 20));
+            buttonChange.setMinimumSize(new Dimension(160, 20));
         }
 
         GroupLayout layout = new GroupLayout(getContentPane());
@@ -74,8 +84,15 @@ public class LoginWindow extends JFrame{
                 )
                 .addGroup(layout.createSequentialGroup()
                     .addGap(0, 380, 900)
+                    .addComponent(buttonReg)
+                    .addGap(30)
                     .addComponent(buttonEnter)
-                    .addGap(0, 250, 900)
+                    .addGap(0, 380, 900)
+                )
+                .addGroup(layout.createSequentialGroup()
+                    .addGap(0, 380, 900)
+                    .addComponent(buttonChange)
+                    .addGap(0, 450, 900)
                 )
                 .addGroup(layout.createSequentialGroup()
                     .addGap(0, 250, 900)
@@ -95,19 +112,28 @@ public class LoginWindow extends JFrame{
                     .addComponent(textFieldPassword)
                 )
                 .addGap(10)
-                .addComponent(buttonEnter)
+                .addGroup(layout.createParallelGroup()
+                    .addComponent(buttonEnter)
+                    .addComponent(buttonReg)
+                )
+                .addGap(10)
+                .addComponent(buttonChange)
                 .addComponent(labelErrorWhileEnter)
                 .addGap(0, 350, 500)
             );
         }
 
         buttonEnter.addActionListener(new EnterEventListener());
+        buttonReg.addActionListener(new RegEventListener());
+        buttonChange.addActionListener(new ChangeEventListener());
 
         pack();
         this.setBounds(100, 100, 1200, 900);
     }
 
     private class EnterEventListener implements ActionListener{
+
+        /*
         HashMap<String, String> getData(){
             HashMap<String, String> map = new HashMap<>();
             try{
@@ -166,6 +192,7 @@ public class LoginWindow extends JFrame{
             }
             return map;
         }
+        */
 
         public void actionPerformed(ActionEvent e){
             String name, password;
@@ -183,21 +210,78 @@ public class LoginWindow extends JFrame{
             }
             name = name.trim();
 
-            HashMap<String, String> map = getData();
-            if(map == null){
+            String p = sheduler.getDataBase().getUserPassword(name);
+            if(p == null){
+                labelErrorWhileEnter.setText("Такого пользователя нет");
+                return;
+            } else if (p.equals(password) == false){
+                labelErrorWhileEnter.setText("Пароль введен с ошибкой");
+                return;
+            }
+            sheduler.loginFinished(name);
+        }
+    }
+
+    private class RegEventListener implements ActionListener{
+        public void actionPerformed(ActionEvent e){
+            String name, password;
+            name = textFieldUserName.getText();
+            password = new String(textFieldPassword.getPassword());
+
+            if(name.isEmpty()){
+                labelErrorWhileEnter.setText("Введите имя пользователя");
+                return;
+            } else if(password.isEmpty()){
+                labelErrorWhileEnter.setText("Введите пароль");
+                return;
+            } else if(password.length() < 4) {
+                labelErrorWhileEnter.setText("Пароль должен содержать больше 4 символов");
+                return;
+            } else {
+                labelErrorWhileEnter.setText("");
+            }
+            name = name.trim();
+
+            User.setDB(sheduler.getDataBase());
+            if(User.userExist(name)){
+                labelErrorWhileEnter.setText("Такой пользователь уже существует");
+                return;
+            }
+            User a = new User(name, password);
+            labelErrorWhileEnter.setText("Пользователь " + name + " успешно зарегистрирован");
+        }
+    }
+
+    private class ChangeEventListener implements ActionListener{
+        public void actionPerformed(ActionEvent e){
+            String name, password;
+            name = textFieldUserName.getText();
+            password = new String(textFieldPassword.getPassword());
+
+            if(name.isEmpty()){
+                labelErrorWhileEnter.setText("Введите имя пользователя");
+                return;
+            } else if(password.isEmpty()){
+                labelErrorWhileEnter.setText("Введите пароль");
+                return;
+            } else if(password.length() < 4) {
+                labelErrorWhileEnter.setText("Пароль должен содержать больше 4 символов");
+                return;
+            } else {
+                labelErrorWhileEnter.setText("");
+            }
+            name = name.trim();
+
+            User.setDB(sheduler.getDataBase());
+            if(!User.userExist(name)){
+                labelErrorWhileEnter.setText("Пользователь должен существовать");
                 return;
             }
 
-            if(map.containsKey(name)){
-                if(map.get(name).equals(password)){
-                    labelErrorWhileEnter.setText("Здравствуйте, " + name);
-                    sheduler.loginFinished(name);
-                } else {
-                    labelErrorWhileEnter.setText("Ошибка в пароле.");
-                }
-            } else {
-                labelErrorWhileEnter.setText("Такой пользователь не найден.");
-            }
+            User a = User.getUser(name);
+            a.changePassword(password);
+            labelErrorWhileEnter.setText("Пароль успешно изменен");
+
         }
     }
 }

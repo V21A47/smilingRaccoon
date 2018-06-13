@@ -1,6 +1,6 @@
 import Interpreter.*;
 import UI.*;
-
+import DB.*;
 
 class Server{
     public static void main(String[] args){
@@ -18,9 +18,8 @@ class Server{
             System.err.println("Environment variable was not set. Use \"dataFile\" instead of it");
             fileName = "dataFile";
         }
+
         Sheduler shed = new Sheduler(fileName, "resources/loginData");
-
-
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
@@ -30,6 +29,8 @@ class Server{
 
 
         Receiver r = new Receiver(shed.getInterpreter(), host, port);
+
+
 
     }
 }
