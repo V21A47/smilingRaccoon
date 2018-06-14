@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.io.FileNotFoundException;
 import DB.*;
 
+import java.util.ResourceBundle;
+import java.util.Locale;
+
 public class LoginWindow extends JFrame{
     private JLabel labelUserName = null;
     private JLabel labelPassword = null;
@@ -17,27 +20,64 @@ public class LoginWindow extends JFrame{
     private JPasswordField textFieldPassword = null;
     private JButton buttonEnter = null;
     private JButton buttonReg = null;
-    private JButton buttonChange = null;
-    private String fileName;
+
+    private JMenuBar menuBar = null;
+    private JMenu menu = null;
+    private JMenuItem menuRussian = null;
+    private JMenuItem menuIcelandic = null;
+    private JMenuItem menuBulgarian = null;
+    private JMenuItem menuEnglish = null;
+
+    private ResourceBundle bundle = null;
+    public Locale locale = null;
+
     private Sheduler sheduler;
 
-    public LoginWindow(Sheduler sheduler, String dataFile){
-        super("LoginWindow");
+    public LoginWindow(Sheduler sheduler){
+        super("Client: LoginWindow");
+
+        try{
+            bundle = ResourceBundle.getBundle("langProperties/package_en_NZ");
+        } catch (Exception e){
+            System.err.println(e + "\nNo localization file data was found");
+            System.exit(1);
+        }
+        locale = new Locale("en", "NZ", "UNIX");
+
+        this.setTitle(bundle.getString("windowTitle"));
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         this.sheduler = sheduler;
-        fileName = dataFile;
+
+        {// MenuBar
+
+            menuBar = new JMenuBar();
+            menu = new JMenu(bundle.getString("menuName"));
+
+            menuRussian = new JMenuItem(bundle.getString("RussianLang"));
+            menuIcelandic = new JMenuItem(bundle.getString("IcelandicLang"));
+            menuBulgarian = new JMenuItem(bundle.getString("BulgarianLang"));
+            menuEnglish = new JMenuItem(bundle.getString("EnglishLang"));
+
+            menu.add(menuRussian);
+            menu.add(menuIcelandic);
+            menu.add(menuBulgarian);
+            menu.add(menuEnglish);
+
+            menuBar.add(menu);
+            this.setJMenuBar(menuBar);
+        }
 
         {// Initializing objects
             labelUserName = new JLabel("Username");
 
-            labelUserName.setMaximumSize(new Dimension(80, 20));
-            labelUserName.setMinimumSize(new Dimension(80, 20));
+            labelUserName.setMaximumSize(new Dimension(120, 20));
+            labelUserName.setMinimumSize(new Dimension(120, 20));
 
             labelPassword = new JLabel("Password");
-            labelPassword.setMaximumSize(new Dimension(80, 20));
-            labelPassword.setMinimumSize(new Dimension(80, 20));
+            labelPassword.setMaximumSize(new Dimension(120, 20));
+            labelPassword.setMinimumSize(new Dimension(120, 20));
 
             labelErrorWhileEnter = new JLabel();
             labelErrorWhileEnter.setMaximumSize(new Dimension(350, 20));
@@ -52,16 +92,12 @@ public class LoginWindow extends JFrame{
             textFieldPassword.setMinimumSize(new Dimension(120, 20));
 
             buttonEnter = new JButton("Enter");
-            buttonEnter.setMaximumSize(new Dimension(80, 20));
-            buttonEnter.setMinimumSize(new Dimension(80, 20));
+            buttonEnter.setMaximumSize(new Dimension(120, 20));
+            buttonEnter.setMinimumSize(new Dimension(120, 20));
 
             buttonReg = new JButton("Registate");
-            buttonReg.setMaximumSize(new Dimension(120, 20));
-            buttonReg.setMinimumSize(new Dimension(120, 20));
-
-            buttonChange = new JButton("Change password");
-            buttonChange.setMaximumSize(new Dimension(160, 20));
-            buttonChange.setMinimumSize(new Dimension(160, 20));
+            buttonReg.setMaximumSize(new Dimension(170, 20));
+            buttonReg.setMinimumSize(new Dimension(170, 20));
         }
 
         GroupLayout layout = new GroupLayout(getContentPane());
@@ -90,11 +126,6 @@ public class LoginWindow extends JFrame{
                     .addGap(0, 380, 900)
                 )
                 .addGroup(layout.createSequentialGroup()
-                    .addGap(0, 380, 900)
-                    .addComponent(buttonChange)
-                    .addGap(0, 450, 900)
-                )
-                .addGroup(layout.createSequentialGroup()
                     .addGap(0, 250, 900)
                     .addComponent(labelErrorWhileEnter)
                     .addGap(0, 250, 900)
@@ -116,8 +147,6 @@ public class LoginWindow extends JFrame{
                     .addComponent(buttonEnter)
                     .addComponent(buttonReg)
                 )
-                .addGap(10)
-                .addComponent(buttonChange)
                 .addComponent(labelErrorWhileEnter)
                 .addGap(0, 350, 500)
             );
@@ -125,10 +154,49 @@ public class LoginWindow extends JFrame{
 
         buttonEnter.addActionListener(new EnterEventListener());
         buttonReg.addActionListener(new RegEventListener());
-        buttonChange.addActionListener(new ChangeEventListener());
-
+        menuRussian.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                locale = new Locale("ru", "RU");
+                changeBundle("package_ru_RU");
+            }
+        });
+        menuIcelandic.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                locale = new Locale("is", "IS");
+                changeBundle("package_is_IS");
+            }
+        });
+        menuBulgarian.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                locale = new Locale("bg", "BG");
+                changeBundle("package_bg_BG");
+            }
+        });
+        menuEnglish.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                locale = new Locale("en", "NZ", "UNIX");
+                changeBundle("package_en_NZ");
+            }
+        });
         pack();
         this.setBounds(100, 100, 1200, 900);
+        changeBundle("package_en_NZ");
+    }
+
+    private void changeBundle(String newBundleFile){
+        try{
+            bundle = ResourceBundle.getBundle("langProperties/" + newBundleFile);
+        } catch (Exception e){
+            System.err.println(e + "\nNo localization file data: " + newBundleFile + " was not found!");
+            return;
+        }
+
+        this.setTitle(bundle.getString("windowTitle"));
+        labelUserName.setText(bundle.getString("Username"));
+        labelPassword.setText(bundle.getString("Password"));
+        buttonEnter.setText(bundle.getString("Enter"));
+        buttonReg.setText(bundle.getString("Registation"));
+        labelErrorWhileEnter.setText("");
     }
 
     private class EnterEventListener implements ActionListener{
@@ -139,10 +207,10 @@ public class LoginWindow extends JFrame{
             password = new String(textFieldPassword.getPassword());
 
             if(name.isEmpty()){
-                labelErrorWhileEnter.setText("Введите имя пользователя");
+                labelErrorWhileEnter.setText(bundle.getString("ER_Username"));
                 return;
             } else if(password.isEmpty()){
-                labelErrorWhileEnter.setText("Введите пароль");
+                labelErrorWhileEnter.setText(bundle.getString("ER_Password"));
                 return;
             } else {
                 labelErrorWhileEnter.setText("");
@@ -151,18 +219,10 @@ public class LoginWindow extends JFrame{
 
             String p = sheduler.getDataBase().getUserPassword(name);
             if(p == null){
-                labelErrorWhileEnter.setText("Такого пользователя нет");
+                labelErrorWhileEnter.setText(bundle.getString("ER_NoUser"));
                 return;
             } else if (p.equals(password) == false){
-                labelErrorWhileEnter.setText("Пароль введен с ошибкой");
-                return;
-            }
-
-            System.out.println(sheduler.getDataBase().getUserA("abc"));
-            User.setDB(sheduler.getDataBase());
-            User u = User.getUser(name);
-            if(!u.isAdmin()){
-                labelErrorWhileEnter.setText("У пользователя " + name + " нет прав на вход");
+                labelErrorWhileEnter.setText(bundle.getString("ER_IncPassword"));
                 return;
             }
             sheduler.loginFinished(name);
@@ -176,13 +236,13 @@ public class LoginWindow extends JFrame{
             password = new String(textFieldPassword.getPassword());
 
             if(name.isEmpty()){
-                labelErrorWhileEnter.setText("Введите имя пользователя");
+                labelErrorWhileEnter.setText(bundle.getString("ER_Username"));
                 return;
             } else if(password.isEmpty()){
-                labelErrorWhileEnter.setText("Введите пароль");
+                labelErrorWhileEnter.setText(bundle.getString("ER_Password"));
                 return;
             } else if(password.length() < 4) {
-                labelErrorWhileEnter.setText("Пароль должен содержать больше 4 символов");
+                labelErrorWhileEnter.setText(bundle.getString("ER_ShortPassword"));
                 return;
             } else {
                 labelErrorWhileEnter.setText("");
@@ -191,44 +251,11 @@ public class LoginWindow extends JFrame{
 
             User.setDB(sheduler.getDataBase());
             if(User.userExist(name)){
-                labelErrorWhileEnter.setText("Такой пользователь уже существует");
+                labelErrorWhileEnter.setText(bundle.getString("ER_UserExists"));
                 return;
             }
-            User a = new User(name, password, true);
-            labelErrorWhileEnter.setText("Пользователь " + name + " успешно зарегистрирован");
-        }
-    }
-
-    private class ChangeEventListener implements ActionListener{
-        public void actionPerformed(ActionEvent e){
-            String name, password;
-            name = textFieldUserName.getText();
-            password = new String(textFieldPassword.getPassword());
-
-            if(name.isEmpty()){
-                labelErrorWhileEnter.setText("Введите имя пользователя");
-                return;
-            } else if(password.isEmpty()){
-                labelErrorWhileEnter.setText("Введите пароль");
-                return;
-            } else if(password.length() < 4) {
-                labelErrorWhileEnter.setText("Пароль должен содержать больше 4 символов");
-                return;
-            } else {
-                labelErrorWhileEnter.setText("");
-            }
-            name = name.trim();
-
-            User.setDB(sheduler.getDataBase());
-            if(!User.userExist(name)){
-                labelErrorWhileEnter.setText("Пользователь должен существовать");
-                return;
-            }
-
-            User a = User.getUser(name);
-            a.changePassword(password);
-            labelErrorWhileEnter.setText("Пароль успешно изменен");
-
+            User a = new User(name, password, false);
+            labelErrorWhileEnter.setText(bundle.getString("ER_User") + name + bundle.getString("ER_Success"));
         }
     }
 }

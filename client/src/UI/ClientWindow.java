@@ -605,6 +605,7 @@ public class ClientWindow extends JFrame{
         checkBandit.setText(bundle.getString("banditTypeLabel"));
         checkArrested.setText(bundle.getString("arrestedCondLabel"));
         checkImprisoned.setText(bundle.getString("imprisonedCondLabel"));
+
         checkFree.setText(bundle.getString("freeCondLabel"));
     }
 
