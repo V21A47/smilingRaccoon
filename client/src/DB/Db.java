@@ -21,7 +21,7 @@ public class Db{
             String password = s.substring(s.indexOf(" ") + 1);
 
             c = DriverManager
-                .getConnection("jdbc:postgresql://localhost:5432/lab8_db",
+                .getConnection("jdbc:postgresql://localhost:9999/studs",
                 login, password);
         } catch (Exception e) {
             e.printStackTrace();

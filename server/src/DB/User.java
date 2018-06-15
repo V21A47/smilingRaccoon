@@ -48,7 +48,7 @@ public class User{
             return null;
         }
 
-        try{
+        try {
             User user = new User(null, null, false);
             Field f = user.getClass().getDeclaredField("name");
             f.setAccessible(true);
