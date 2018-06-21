@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.io.IOException;
 import java.io.FileNotFoundException;
 import DB.*;
+import java.util.*;
 
 import java.util.ResourceBundle;
 import java.util.Locale;
@@ -217,15 +218,27 @@ public class LoginWindow extends JFrame{
             }
             name = name.trim();
 
-            String p = sheduler.getDataBase().getUserPassword(name);
-            if(p == null){
-                labelErrorWhileEnter.setText(bundle.getString("ER_NoUser"));
-                return;
-            } else if (p.equals(password) == false){
-                labelErrorWhileEnter.setText(bundle.getString("ER_IncPassword"));
-                return;
+            try{
+                int amount = LittleORM.getObjectsAmount(Class.forName("DB.User"));
+                if(amount == 0){
+                    labelErrorWhileEnter.setText("Такого пользователя нет");
+                    return;
+                } else {
+                    for(int i = 1; i <= amount; i++){
+                        User user = (User)LittleORM.loadObject(Class.forName("DB.User"), i);
+                        if(user.getName().equals(name)){
+                            if(!user.isPassword(password)){
+                                labelErrorWhileEnter.setText("Пароль введен с ошибкой");
+                                return;
+                            } else{
+                                sheduler.loginFinished(name);
+                                return;
+                            }
+                        }
+                    }
+                }
+            } catch (Exception exxx){
             }
-            sheduler.loginFinished(name);
         }
     }
 
@@ -249,13 +262,26 @@ public class LoginWindow extends JFrame{
             }
             name = name.trim();
 
-            User.setDB(sheduler.getDataBase());
-            if(User.userExist(name)){
-                labelErrorWhileEnter.setText(bundle.getString("ER_UserExists"));
-                return;
+            try{
+                int amount = LittleORM.getObjectsAmount(Class.forName("DB.User"));
+                for(int i = 1; i <= amount; i++){
+                    User user = (User)LittleORM.loadObject(Class.forName("DB.User"), i);
+                    if(user.getName().equals(name)){
+                        labelErrorWhileEnter.setText(bundle.getString("ER_UserExists"));
+                        return;
+                    }
+                }
+                ArrayList<Object> list = new ArrayList<>();
+                list.add(false);
+                list.add(name);
+                list.add(password);
+
+                LittleORM.createObject(Class.forName("DB.User"), list);
+                labelErrorWhileEnter.setText(bundle.getString("ER_User") + name + bundle.getString("ER_Success"));
+            } catch (Exception exxx){
+
             }
-            User a = new User(name, password, false);
-            labelErrorWhileEnter.setText(bundle.getString("ER_User") + name + bundle.getString("ER_Success"));
+
         }
     }
 }
