@@ -4,6 +4,7 @@ import java.awt.*;
 
 import Interpreter.*;
 import DB.*;
+import java.util.*;
 
 public class Sheduler{
     private LoginWindow loginWindow = null;
@@ -12,7 +13,6 @@ public class Sheduler{
     private CollectionStorage storage;
     private Interpreter interpreter = null;
 
-    private Db dataBase = null;
 
     private String fileName;
     private String userName;
@@ -22,14 +22,10 @@ public class Sheduler{
         this.storage = new CollectionStorage("Storage", savingDataFileName);
         this.interpreter = new Interpreter(this, savingDataFileName, storage);
         this.interpreter.loadData();
-        dataBase = new Db();
 
         startLogin();
     }
 
-    public Db getDataBase(){
-        return this.dataBase;
-    }
 
     public void updateTree(){
         serverWindow.updateTree();

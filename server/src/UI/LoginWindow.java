@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.io.IOException;
 import java.io.FileNotFoundException;
 import DB.*;
+import java.util.*;
 
 public class LoginWindow extends JFrame{
     private JLabel labelUserName = null;
@@ -149,23 +150,30 @@ public class LoginWindow extends JFrame{
             }
             name = name.trim();
 
-            String p = sheduler.getDataBase().getUserPassword(name);
-            if(p == null){
-                labelErrorWhileEnter.setText("Такого пользователя нет");
-                return;
-            } else if (p.equals(password) == false){
-                labelErrorWhileEnter.setText("Пароль введен с ошибкой");
-                return;
+            try{
+                int amount = LittleORM.getObjectsAmount(Class.forName("DB.User"));
+                if(amount == 0){
+                    labelErrorWhileEnter.setText("Такого пользователя нет");
+                    return;
+                } else {
+                    for(int i = 1; i <= amount; i++){
+                        User user = (User)LittleORM.loadObject(Class.forName("DB.User"), i);
+                        if(user.getName().equals(name)){
+                            if(!user.isPassword(password)){
+                                labelErrorWhileEnter.setText("Пароль введен с ошибкой");
+                                return;
+                            } else if(user.isAdmin()){
+                                sheduler.loginFinished(name);
+                                return;
+                            } else {
+                                labelErrorWhileEnter.setText("У пользователя " + name + " нет прав на вход");
+                                return;
+                            }
+                        }
+                    }
+                }
+            } catch (Exception exxx){
             }
-
-            System.out.println(sheduler.getDataBase().getUserA("abc"));
-            User.setDB(sheduler.getDataBase());
-            User u = User.getUser(name);
-            if(!u.isAdmin()){
-                labelErrorWhileEnter.setText("У пользователя " + name + " нет прав на вход");
-                return;
-            }
-            sheduler.loginFinished(name);
         }
     }
 
@@ -189,13 +197,26 @@ public class LoginWindow extends JFrame{
             }
             name = name.trim();
 
-            User.setDB(sheduler.getDataBase());
-            if(User.userExist(name)){
-                labelErrorWhileEnter.setText("Такой пользователь уже существует");
-                return;
+            try{
+                int amount = LittleORM.getObjectsAmount(Class.forName("DB.User"));
+                for(int i = 1; i <= amount; i++){
+                    User user = (User)LittleORM.loadObject(Class.forName("DB.User"), i);
+                    if(user.getName().equals(name)){
+                        labelErrorWhileEnter.setText("Такой пользователь уже существует");
+                        return;
+                    }
+                }
+                System.out.println("!!");
+                ArrayList<Object> list = new ArrayList<>();
+                list.add(true);
+                list.add(name);
+                list.add(password);
+
+                LittleORM.createObject(Class.forName("DB.User"), list);
+                labelErrorWhileEnter.setText("Пользователь " + name + " успешно зарегистрирован");
+            } catch (Exception exxx){
+
             }
-            User a = new User(name, password, true);
-            labelErrorWhileEnter.setText("Пользователь " + name + " успешно зарегистрирован");
         }
     }
 
@@ -219,16 +240,22 @@ public class LoginWindow extends JFrame{
             }
             name = name.trim();
 
-            User.setDB(sheduler.getDataBase());
-            if(!User.userExist(name)){
+            try{
+                int amount = LittleORM.getObjectsAmount(Class.forName("DB.User"));
+                for(int i = 1; i <= amount; i++){
+                    User user = (User)LittleORM.loadObject(Class.forName("DB.User"), i);
+                    if(user.getName().equals(name)){
+                        user.setPassword(password);
+                        labelErrorWhileEnter.setText("Пароль успешно изменен");
+                        return;
+                    }
+                }
+
                 labelErrorWhileEnter.setText("Пользователь должен существовать");
                 return;
+            } catch (Exception exxx){
+
             }
-
-            User a = User.getUser(name);
-            a.changePassword(password);
-            labelErrorWhileEnter.setText("Пароль успешно изменен");
-
         }
     }
 }

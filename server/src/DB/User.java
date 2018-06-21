@@ -2,72 +2,64 @@ package DB;
 
 import java.lang.reflect.Field;
 
-public class User{
-    private String name;
-    private String password;
+public class User implements AvailableForORM{
+    private int id;
     private boolean admin;
+    private UserProperties prop;
+    private boolean isExpired = false;
 
-    private static Db db = null;
-
-    public String getName(){
-        return name;
+    public int getID(){
+        return id;
     }
 
-    public String getPassword(){
-        return password;
-    }
-
-    public User(String name, String password, boolean admin){
-        db.addUser(name, password, admin);
-        this.name = name;
-        this.password = password;
-        this.admin = admin;
-    }
-
-    public static boolean userExist(String userName){
-        if(db.getUserPassword(userName) != null){
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public boolean changePassword(String newPassword){
-        return db.changePassword(name, newPassword);
+    public void update(){
+        this.isExpired = !LittleORM.checkObjectExist(this);
+        // from base
     }
 
     public boolean isAdmin(){
+        update();
         return admin;
     }
 
-    public static User getUser(String name){
-        String password = db.getUserPassword(name);
-        boolean b = db.getUserA(name);
-
-        if(password == null){
-            return null;
+    public void setName(String name){
+        if(isExpired){
+            return;
         }
-
-        try {
-            User user = new User(null, null, false);
-            Field f = user.getClass().getDeclaredField("name");
-            f.setAccessible(true);
-            f.set(user, name);
-            f = user.getClass().getDeclaredField("password");
-            f.setAccessible(true);
-            f.set(user, password);
-            f = user.getClass().getDeclaredField("admin");
-            f.setAccessible(true);
-            f.set(user, b);
-
-            return user;
-        } catch (IllegalAccessException|NoSuchFieldException e){
-            System.err.println(e);
-        }
-        return null;
+        prop.setName(name);
+        LittleORM.updateObject(this);
     }
 
-    public static void setDB(Db newDb){
-        db = newDb;
+    public String getName(){
+        update();
+        return prop.getName();
+    }
+
+    public boolean isExpired(){
+        update();
+        return isExpired;
+    }
+
+    public void setPassword(String password){
+        prop.setPassword(password);
+        LittleORM.updateObject(this);
+    }
+
+    public boolean isPassword(String password){
+        update();
+        if(isExpired){
+            return false;
+        }
+        return prop.isPassword(password);
+    }
+
+    public User(){
+        ;
+    }
+
+    public User(boolean admin, String name, String password){
+        prop = new UserProperties(name, password);
+        this.admin = admin;
+
     }
 }

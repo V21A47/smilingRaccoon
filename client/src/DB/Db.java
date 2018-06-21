@@ -14,7 +14,7 @@ public class Db{
 
     public Db(){
         try {
-            Class.forName("org.postgresql.Driver");
+            //Class.forName("org.postgresql.Driver");
             BufferedReader i = new BufferedReader(new FileReader("resources/loginData"));
             String s = i.readLine();
             String login = s.substring(0, s.indexOf(" "));
