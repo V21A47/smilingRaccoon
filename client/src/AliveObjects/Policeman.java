@@ -8,29 +8,25 @@ public class Policeman extends Human implements LawDefender {
     }
 
     public boolean getGrounds(AliveObject object){
-        if(groundsForActivity.getImportance() >= 0.3D && groundsForActivity.getObject().equals(object)){
-            return true;
-        } else {
-            return false;
-        }
+        return true;
     }
 
     public void arrest(Human human){
         if(getGrounds(human)){
-            Human.ConditionInCommunity condition = new ConditionInCommunity(0.7, StateOfFreedom.ARRESTED, 14);
+            Human.ConditionInCommunity condition = new ConditionInCommunity(StateOfFreedom.ARRESTED, 14);
             human.condition = condition;
         }
     }
 
     public void free(Human human){
         if(getGrounds(human)){
-            Human.ConditionInCommunity condition = new ConditionInCommunity(1.0D, StateOfFreedom.FREE, -1);
+            Human.ConditionInCommunity condition = new ConditionInCommunity(StateOfFreedom.FREE, -1);
             human.condition = condition;
         }
     }
 
     public void imprison(Human human, int days){
-        Human.ConditionInCommunity condition = new ConditionInCommunity(0.5, StateOfFreedom.IMPRISONED, days);
+        Human.ConditionInCommunity condition = new ConditionInCommunity(StateOfFreedom.IMPRISONED, days);
         human.condition = condition;
     }
 

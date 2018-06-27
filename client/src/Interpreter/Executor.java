@@ -3,98 +3,160 @@ package Interpreter;
 import AliveObjects.Human;
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
+import java.util.HashSet;
 
-public class Executor{
+import UI.*;
 
-    private int numberOfCalls = 0;
-    private int maxNumberOfCalls = 30;
+public class Executor extends Thread{
 
     private String host = "localhost";
-    private int port = 3128;
+    private int port = 3129;
+
+    private InputStream is;
+    private OutputStream os;
+    private Sheduler sheduler;
 
     private Socket socket = null;
+    private boolean shouldWork = true;
 
-    private Socket getSocket() throws InterruptedException{
-        if(numberOfCalls == maxNumberOfCalls){
-            return null;
-        }
+    private HashSet<Human> set;
 
+
+    public HashSet getSet(){
+        return set;
+    }
+
+    private Socket getSocket() {
         Socket newSocket = null;
         try{
             newSocket = new Socket(host, port);
+            is = newSocket.getInputStream();
+            os = newSocket.getOutputStream();
+
         } catch (IOException e){
-            Thread.sleep(500);
-            numberOfCalls+=1;
+            try{
+                Thread.sleep(500);
+            } catch (InterruptedException er){
+                System.err.println(er);
+                return null;
+            }
             newSocket = getSocket();
         }
 
-        numberOfCalls = 0;
+
         return newSocket;
     }
 
-    public Executor(){
+    public Executor(Sheduler sheduler, String host, int port){
+        this.host = host;
+        this.port = port;
+        set = new HashSet<Human>();
 
-        jsch = new JSch();
+        this.sheduler = sheduler;
+        start();
 
-        try{
-            Session session = jsch.getSession("s242425", "helios.cs.ifmo.ru", 2222);
-            session.setPassword("vng051");
-            session.setConfig("StrictHostKeyChecking", "no");
-            session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
-            session.connect();
-            ch = session.getStreamForwarder("helios.cs.ifmo.ru", port);
+    }
+
+    public void run(){
+        while(shouldWork){
+            if(socket == null){
+                socket = getSocket();
+            }
+
+            if(sheduler.getClientWindow() != null){
+                sheduler.getClientWindow().changeTitle(true);
+            }
+
+            execute(null, null);
 
             try{
-                os = ch.getOutputStream();
-                is = ch.getInputStream();
-                ch.connect();
-            } catch (IOException e){
+                Thread.sleep(100);
+            } catch (InterruptedException e){
                 System.err.println(e);
+                return;
             }
-        } catch (JSchException e){
-            System.err.println(e);
         }
+    }
 
+    public Sheduler getSheduler(){
+        return sheduler;
+    }
+
+    private boolean send(Serializable obj) throws IOException{
+        ByteArrayOutputStream baos = new  ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+
+        oos.writeObject(obj);
+        oos.flush();
+
+        byte [] serObj = baos.toByteArray();
+
+        os.write(serObj);
+
+        return true;
+    }
+
+    private Object receive() throws IOException, ClassNotFoundException{
+            byte [] serializedObject = new byte[1024*64];
+            is.read(serializedObject);
+            ByteArrayInputStream bis = new ByteArrayInputStream(serializedObject);
+            ObjectInputStream ois = new ObjectInputStream(bis);
+
+            return ois.readObject();
     }
 
     public void execute(String command, String operand){
         try{
-            // Send
-            String message = "";
+            send(new Byte( (byte)0 ));
 
-            if(operand == null){
-                message = command;
+            Byte answer = (Byte)receive();
+
+
+            if(answer != null){
+                switch(answer.byteValue()){
+                    case 0:
+                        break;
+
+                    case 1:
+                        // Add an object
+                        send(new Byte( (byte)1));
+                        Human human = (Human)receive();
+                        send(new Byte( (byte)1));
+                        set.add(human);
+                        break;
+
+                    case 2:
+                        // Delete an object
+                        send(new Byte( (byte)1));
+                        human = (Human)receive();
+                        send(new Byte( (byte)1));
+                        set.remove(human);
+                        break;
+                }
+
+                if(answer != 0){
+                    for(Human human : set){
+                    }
+                    if(sheduler.getClientWindow() != null){
+                        sheduler.getClientWindow().update();
+                    } else {
+                    }
+                }
+
             } else {
-                message = new String(command + " " + operand);
+                System.out.println("Got null!");
             }
 
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(bos);
+        } catch (IOException er){
+            if(sheduler.getClientWindow() != null &&
+                        sheduler.getClientWindow().getTitle().equals(" is not connected now!") == false){
+                sheduler.getClientWindow().changeTitle(false);
+            }
+            socket = null;
 
-            oos.writeObject(message);
-            oos.flush();
-
-            byte [] serializedObject = bos.toByteArray();
-            String amount = String.valueOf(serializedObject.length);
-
-            socket.getOutputStream().write(serializedObject);
-
-
-            Thread.sleep(25);
-
-
-            // Receive
-            serializedObject = new byte[1024];
-            socket.getInputStream().read(serializedObject);
-            ByteArrayInputStream bis = new ByteArrayInputStream(serializedObject);
-            ObjectInputStream ois = new ObjectInputStream(bis);
-            Object obj = ois.readObject();
-            String str = (String)obj;
-            System.out.println(str);
-
-
-        } catch (ConnectException|StreamCorruptedException e){
-            System.err.println("Server is not available now");
+        } catch (ClassNotFoundException e){
+            System.err.println(e);
         } catch (Exception e){
             System.err.println(e);
         }

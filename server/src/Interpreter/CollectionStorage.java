@@ -17,10 +17,12 @@ import java.util.NoSuchElementException;
  * Реализует работу с коллекцией.
  *
  */
+
 public class CollectionStorage {
     private String name;
     private String fileName;
     private ConcurrentSkipListSet<Human> set = new ConcurrentSkipListSet<>(new Human.HumanComparator());
+    private boolean isUpdated = false;
 
     public boolean isEmpty(){
         return set.isEmpty();
@@ -35,6 +37,26 @@ public class CollectionStorage {
 
     }
 
+    public boolean isIn(Human human){
+        return set.contains(human);
+    }
+
+    public boolean isUpdated(){
+        return isUpdated;
+    }
+
+    public void setUpdated(){
+        isUpdated = false;
+    }
+
+    public ConcurrentSkipListSet getSet(){
+        return set;
+    }
+
+    public Object[] getArrayOfHumans(){
+        return set.toArray();
+    }
+
     public String getName(){return name;}
 
     /**
@@ -47,6 +69,7 @@ public class CollectionStorage {
         if(!set.remove(element)){
             return (element + " can't be removed from the collection.");
         } else {
+            isUpdated = true;
             return (element + " was deleted");
         }
     }
@@ -64,6 +87,7 @@ public class CollectionStorage {
         if(size == set.size()){
             return ("No elements which are greater than " + element);
         } else {
+            isUpdated = true;
             return ("Elements which are greater than " + element + " were deleted.");
         }
     }
@@ -81,6 +105,7 @@ public class CollectionStorage {
         if(size == set.size()){
             return ("No elements which are lower than " + element);
         } else {
+            isUpdated = true;
             return ("Elements which are lower than " + element + " were deleted.");
         }
     }
@@ -95,6 +120,7 @@ public class CollectionStorage {
         if (!set.add(element)) {
             return (element + " can't be added to the collection.");
         } else {
+            isUpdated = true;
             return (element + " was added to the collection.");
         }
     }
@@ -117,7 +143,9 @@ public class CollectionStorage {
         if(size == set.size()){
             return (element + " can't be added to the collection.");
         } else {
+            isUpdated = true;
             return (element + " was added to the collection.");
+
         }
     }
 
@@ -139,7 +167,9 @@ public class CollectionStorage {
         if(size == set.size()){
             return (element + " can't be added to the collection.");
         } else {
+            isUpdated = true;
             return (element + " was added to the collection.");
+
         }
     }
 
@@ -155,13 +185,15 @@ public class CollectionStorage {
         int size = set.size();
 
         if(humans == null){
-            return ("No data was loaded from the file.");
+            return ("Из файла " + fileName + " ничего не было загружено");
         } else {
             set.addAll(humans);
             if(size == set.size()){
-                return("No data was loaded from the file.");
+                return("В файле нет новых объектов");
             }else{
-                return ("Some objects were loaded from a file " + fileName);
+                isUpdated = true;
+                return ("Из файла " + fileName + " были загружены новые объекты");
+
             }
         }
     }
@@ -185,7 +217,7 @@ public class CollectionStorage {
                 if(t.length() < 10){
                     t = new String(t + "    ");
                 }
-                s.append(h.getName() +"\t"+ h.getAge() +"\t"+ h.getSizeValue() +"\t"+ t +"   "+ h.getX() +"\t"+ h.getY() + "\n");
+                s.append(h.getName() +"\t"+ h.getYearOfBirth() +"\t"+ h.getSizeValue() +"\t"+ t +"   "+ h.getX() +"\t"+ h.getY() + "\n");
             }
         }
 
@@ -200,7 +232,7 @@ public class CollectionStorage {
         CSVManager.clearFile(fileName);
         set.stream().forEach( (p) -> CSVManager.writeToFile(p, fileName));
 
-        return("The collection was saved to the file " + fileName);
+        return("Коллекция была сохранена в файл " + fileName);
     }
 
     /**
@@ -208,7 +240,9 @@ public class CollectionStorage {
      */
     public String clear(){
         set.clear();
-        return("All elements were deleted from the collection");
+        isUpdated = true;
+        return("Из коллекции удалены все элементы");
+
     }
 
     /**
@@ -219,9 +253,10 @@ public class CollectionStorage {
         importFromFile(fileName);
 
         if(set.size() > 0){
-            return ("Some objects were loaded from a file " + fileName);
+            isUpdated = true;
+            return ("Данные загружены из файла " + fileName);
         } else {
-            return ("No objects were loaded from a file " + fileName);
+            return ("Из файла " + fileName + " ничего не было загружено" );
         }
     }
     public String story(){
@@ -250,19 +285,11 @@ public class CollectionStorage {
         bandit1.move(25, 25);
         bandit2.move(26, 25);
 
-        s.append(info());
-
-        policeman.move(-19, -19);
-        bandit1.move(-22, -22);
-        bandit2.move(-21, -22);
-
         s.append("И ловит их наконец!\n");
-
-        policeman.arrest(bandit1);
-        policeman.arrest(bandit2);
-
+        set.remove(bandit1);
+        set.remove(bandit2);
         s.append(info());
-
+        isUpdated = true;
         return s.toString();
     }
 }

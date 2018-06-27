@@ -2,30 +2,44 @@
 
     <path id="classpath">
         <fileset dir="libs">
-            <include name="*.jar"/>
+            <include name="**/*.jar"/>
         </fileset>
     </path>
 
-    <target name="send" depends="stuff.jar.server">
-        <echo message="Using Java version ${ant.java.version}."/>
-        <echo>Java/JVM version: ${ant.java.version}</echo>
-        <echo>Java/JVM detail version: ${java.version}</echo>
+  <target name="c" depends="clean.client,stuff.jar.client">
+        <java jar="client.jar" fork="true" />
     </target>
 
-    <target name="build.server" description="build the server part of the program">
+    <target name="s" depends="clean.server,stuff.jar.server">
+        <java jar="server.jar" fork="true" />
+    </target>
+
+    <target name="build.server18" description="build the server part of the program">
         <mkdir dir="server/build"/>
         <javac includeAntRuntime="no" executable="/usr/jdk/jdk1.8.0/bin/javac" deprecation="true" destdir="server/build" classpathref="classpath" includeantruntime="true">
             <src path="server/src"/>
         </javac>
     </target>
 
+
+
+    <target name="build.server" description="build the server part of the program">
+        <mkdir dir="server/build"/>
+        <javac includeAntRuntime="no" deprecation="true" destdir="server/build" classpathref="classpath" includeantruntime="true">
+            <src path="server/src"/>
+        </javac>
+    </target>
+
+
+
     <target name="clean.client" description="clean client parh of the project">
         <delete dir="client/build"/>
     </target>
-
+      
     <target name="clean.server" description="clean server parh of the project">
         <delete dir="server/build"/>
     </target>
+
 
     <target name="clean.jars" description="clean created jars">
         <delete file="client.jar"/>
@@ -36,6 +50,8 @@
 
     <target name="build" description="build the project" depends="build.client,build.server"></target>
 
+
+
     <target name="build.client" description="build the client part of the project">
         <mkdir dir="client/build"/>
         <javac destdir="client/build" classpathref="classpath" includeantruntime="false">
@@ -43,36 +59,32 @@
         </javac>
     </target>
 
+    <target name="send">
+        <exec executable="/bin/bash">
+            <arg value="send.sh"/>
+        </exec>
+    </target>
 
     <target name="stuff.jar.client" description="create a jar file for client part" depends="build.client">
         <manifest file="client/build/MANIFEST.MF">
             <attribute name="Main-Class" value="Client"/>
-            <attribute name="Class-Path" value="libs/gson-2.8.2.jar libs/jsch-0.1.54.jar"/>
-
+            <attribute name="Class-Path" value="libs/gson-2.8.2.jar libs/postgresql-42.2.2.jar"/>
         </manifest>
 
         <jar destfile="client.jar" manifest="client/build/MANIFEST.MF">
             <fileset dir="client/build">
                 <include name="**/*.class"/>
             </fileset>
+            <fileset dir="resources">
+                <include name="**/*"/>
+            </fileset>
         </jar>
     </target>
-
-
-    <target name="run.client" description="run client part" depends="stuff.jar.client">
-        <java jar="client.jar" fork="true"/>
-    </target>
-
-
-
-    <target name="run.server" description="run server part" depends="stuff.jar.server">
-        <java jar="server.jar" fork="true"/>
-    </target>
-
+  
     <target name="stuff.jar.server" description="create a jar file for server part" depends="build.server">
         <manifest file="server/build/MANIFEST.MF">
             <attribute name="Main-Class" value="Server"/>
-            <attribute name="Class-Path" value="libs/gson-2.8.2.jar"/>
+            <attribute name="Class-Path" value="libs/gson-2.8.2.jar libs/postgresql-42.2.2.jar"/>
         </manifest>
 
         <jar destfile="server.jar" manifest="server/build/MANIFEST.MF">
@@ -81,7 +93,14 @@
             </fileset>
         </jar>
     </target>
+  
+    <target name="stuff.jar.server18" description="create a jar file for server part" depends="build.server18">
+        <antcall target="stuff.jar.server"/>
 
-    <target name="stuff.jars" depends="stuff.jar.server,stuff.jar.client">
     </target>
+
+
+
+
+    <target name="stuff.jars" depends="stuff.jar.server,stuff.jar.client"/>
 </project>

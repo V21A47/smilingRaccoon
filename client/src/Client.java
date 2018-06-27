@@ -1,13 +1,21 @@
-import Interpreter.Reader;
+import Interpreter.*;
+import UI.*;
+
 import java.io.IOException;
 
-public class Client{    
+public class Client{
+
     public static void main(String[] args){
-        Reader reader = new Reader();
-        try{
-            reader.go();
-        } catch (IOException e){
-            System.err.println(e);
+        String host = "localhost";
+        int port = 8081;
+
+        if(args.length == 2){
+            host = args[0];
+            port = Integer.parseInt(args[1]);
         }
+
+        Sheduler sheduler = new Sheduler(host, port);
     }
+
+
 }

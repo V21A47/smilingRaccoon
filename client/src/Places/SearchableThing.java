@@ -1,11 +1,21 @@
 package Places;
+import java.io.Serializable;
 
-public abstract class SearchableThing{
+public abstract class SearchableThing implements Serializable{
     private double sizeValue;
     private String name;
     private int x;
     private int y;
-    
+
+    public static int maxX = 350;
+    public static int minX = -350;
+    public static int maxY = 300;
+    public static int minY = -300;
+
+    public SearchableThing(){
+
+    }
+
     public SearchableThing(double sizeValue){
         if(sizeValue < 0.0D){
             this.sizeValue = 0.0D;
@@ -16,10 +26,11 @@ public abstract class SearchableThing{
 
     public SearchableThing(double sizeValue, String name, int x, int y){
         this(sizeValue, name);
-        this.x = x;
-        this.y = y;
+        if(! move(x, y)){
+            move(SearchableThing.minX, SearchableThing.minY);
+        }
     }
-    
+
     public SearchableThing(double sizeValue, String name){
         if(sizeValue < 0.0D){
             this.sizeValue = 0.0D;
@@ -32,16 +43,25 @@ public abstract class SearchableThing{
     public int getX(){
         return x;
     }
-    
+
     public int getY(){
         return y;
     }
-    
-    public void move(int x, int y){
+
+    public boolean move(int x, int y){
+        if(x < SearchableThing.minX || x > SearchableThing.maxX){
+            return false;
+        }
+
+        if(y < SearchableThing.minY || y > SearchableThing.maxY){
+            return false;
+        }
+
         this.x = x;
         this.y = y;
+        return true;
     }
-    
+
     public void setName(String name){
         this.name = name;
     }

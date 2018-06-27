@@ -38,9 +38,6 @@ public class CSVManager {
         text.append(human.getType());
         text.append(",");
 
-        text.append(human.getConditionInCommunity().getPublicAcceptance());
-        text.append(",");
-
         text.append(human.getConditionInCommunity().getState());
         text.append(",");
 
@@ -50,16 +47,19 @@ public class CSVManager {
         text.append(human.isAlive());
         text.append(",");
 
-        text.append(human.getAge());
+        text.append(human.getYearOfBirth());
         text.append(",");
 
         text.append(human.getSizeValue());
         text.append(",");
 
-        text.append(human.getName());
+        text.append(human.getGender());
         text.append(",");
 
-        text.append(human.getYearOfBirth());
+        text.append(human.getTime());
+        text.append(",");
+
+        text.append(human.getName());
 
         text.append(System.lineSeparator());
 
@@ -124,14 +124,14 @@ public class CSVManager {
                             "\"y\":" + listOfValues.get(1) + "," +
                             "\"type\":\"" + listOfValues.get(2) + "\"," +
                             "\"condition\":{" +
-                            "\"publicAcceptance\":" +  listOfValues.get(3) + "," +
-                            "\"state\":\"" + listOfValues.get(4) + "\"," +
-                            "\"remainingTime\":" + listOfValues.get(5) + "}," +
-                            "\"isAlive\":" + listOfValues.get(6) + "," +
-                            "\"age\":" + listOfValues.get(7) + "," +
-                            "\"sizeValue\":" + listOfValues.get(8) + "," +
-                            "\"name\":\"" + listOfValues.get(9) + "\"," +
-                            "\"yearOfBirth\":" + listOfValues.get(10) +
+                            "\"state\":\"" + listOfValues.get(3) + "\"," +
+                            "\"remainingTime\":" + listOfValues.get(4) + "}," +
+                            "\"isAlive\":" + listOfValues.get(5) + "," +
+                            "\"yearOfBirth\":" + listOfValues.get(6) + "," +
+                            "\"sizeValue\":" + listOfValues.get(7) + "," +
+                            "\"gender\":\"" + listOfValues.get(8) + "\"," +
+                            "\"time\":\"" + listOfValues.get(9) + "\"," +
+                            "\"name\":\"" + listOfValues.get(10) + "\"" +
                             "}";
 
                 }catch (IndexOutOfBoundsException ex) {
