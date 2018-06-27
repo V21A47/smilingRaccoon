@@ -10,6 +10,8 @@ import java.sql.ResultSet;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class LittleORM{
     private static Connection connection = null;
@@ -31,6 +33,23 @@ public class LittleORM{
             System.exit(0);
         }
         System.out.println("LittleORM has just created a connection to the database!");
+    }
+
+    public static String getMD5(String str) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(str.getBytes());
+            System.out.println();
+            byte[] mdBytes = md.digest();
+            StringBuilder sb = new StringBuilder();
+            for(int i = 0; i < mdBytes.length; i++) {
+                sb.append(Integer.toString((mdBytes[i] & 0xff) + 0x100, 16)
+                    .substring(1));
+        }
+            return sb.toString().trim();
+        } catch (NoSuchAlgorithmException exc) {
+            return null;
+        }
     }
 
     private static String getTableName(Class objectClass){
@@ -336,7 +355,6 @@ public class LittleORM{
 
         return true;
     }
-
 
     public static AvailableForORM loadObject(Class objectClass, int id){
         if(!checkTableExist(objectClass)){

@@ -227,7 +227,7 @@ public class LoginWindow extends JFrame{
                     for(int i = 1; i <= amount; i++){
                         User user = (User)LittleORM.loadObject(Class.forName("DB.User"), i);
                         if(user.getName().equals(name)){
-                            if(!user.isPassword(password)){
+                            if(!user.isPassword(LittleORM.getMD5(password))){
                                 labelErrorWhileEnter.setText("Пароль введен с ошибкой");
                                 return;
                             } else{
@@ -274,9 +274,9 @@ public class LoginWindow extends JFrame{
                 ArrayList<Object> list = new ArrayList<>();
                 list.add(false);
                 list.add(name);
-                list.add(password);
+                list.add(LittleORM.getMD5(password));
 
-                LittleORM.createObject(Class.forName("DB.User"), list);
+                User a = (User)LittleORM.createObject(Class.forName("DB.User"), list);
                 labelErrorWhileEnter.setText(bundle.getString("ER_User") + name + bundle.getString("ER_Success"));
             } catch (Exception exxx){
 
