@@ -251,6 +251,7 @@ public class CollectionStorage {
     public String load() {
         set.clear();
         importFromFile(fileName);
+
         if(set.size() > 0){
             isUpdated = true;
             return ("Данные загружены из файла " + fileName);
@@ -258,7 +259,6 @@ public class CollectionStorage {
             return ("Из файла " + fileName + " ничего не было загружено" );
         }
     }
-
     public String story(){
         set.clear();
         StringBuilder s = new StringBuilder();

@@ -20,15 +20,15 @@ import AliveObjects.*;
 public class Receiver extends Thread{
     private SocketChannel sc;
     private Interpreter interpreter = null;
-
     private String host = "localhost";
     private int port = 3129;
 
     private HashSet<Human> set;
-
+  
     public Receiver(Interpreter inter, String host, int port){
         this.host = host;
         this.port = port;
+
 
         interpreter = inter;
 

@@ -9,6 +9,7 @@ import java.util.HashSet;
 import UI.*;
 
 public class Executor extends Thread{
+
     private String host = "localhost";
     private int port = 3129;
 
@@ -54,6 +55,7 @@ public class Executor extends Thread{
 
         this.sheduler = sheduler;
         start();
+
     }
 
     public void run(){

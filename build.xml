@@ -6,7 +6,7 @@
         </fileset>
     </path>
 
-    <target name="c" depends="clean.client,stuff.jar.client">
+  <target name="c" depends="clean.client,stuff.jar.client">
         <java jar="client.jar" fork="true" />
     </target>
 
@@ -16,7 +16,7 @@
 
     <target name="build.server18" description="build the server part of the program">
         <mkdir dir="server/build"/>
-        <javac includeAntRuntime="no" deprecation="true" target="1.8" source="1.8" destdir="server/build" classpathref="classpath" includeantruntime="true">
+        <javac includeAntRuntime="no" executable="/usr/jdk/jdk1.8.0/bin/javac" deprecation="true" destdir="server/build" classpathref="classpath" includeantruntime="true">
             <src path="server/src"/>
         </javac>
     </target>
@@ -35,13 +35,10 @@
     <target name="clean.client" description="clean client parh of the project">
         <delete dir="client/build"/>
     </target>
-
-
-
+      
     <target name="clean.server" description="clean server parh of the project">
         <delete dir="server/build"/>
     </target>
-
 
 
     <target name="clean.jars" description="clean created jars">
@@ -49,11 +46,7 @@
         <delete file="server.jar"/>
     </target>
 
-
-
     <target name="clean" description="clean the project" depends="clean.server,clean.client,clean.jars"></target>
-
-
 
     <target name="build" description="build the project" depends="build.client,build.server"></target>
 
@@ -65,8 +58,6 @@
             <src path="client/src"/>
         </javac>
     </target>
-
-
 
     <target name="send">
         <exec executable="/bin/bash">
@@ -89,8 +80,7 @@
             </fileset>
         </jar>
     </target>
-
-
+  
     <target name="stuff.jar.server" description="create a jar file for server part" depends="build.server">
         <manifest file="server/build/MANIFEST.MF">
             <attribute name="Main-Class" value="Server"/>
@@ -103,12 +93,10 @@
             </fileset>
         </jar>
     </target>
-
-
-
-
+  
     <target name="stuff.jar.server18" description="create a jar file for server part" depends="build.server18">
         <antcall target="stuff.jar.server"/>
+
     </target>
 
 
